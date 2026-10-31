@@ -156,8 +156,8 @@ window.cartHtml = function () {
     (staff() ? '<label>Customer name or phone<input type="text" maxlength="60" value="' + esc(f.cn) + '" oninput="A2.field(\'cn\',this.value)" placeholder="Who is this order for?"></label>' : '') +
     '<label>Delivery address<textarea rows="3" maxlength="300" oninput="A2.field(\'addr\',this.value)" placeholder="House no, street, area, Bengaluru">' + esc(f.addr) + '</textarea></label>' +
     '<div class="row" style="gap:8px"><label style="flex:1">Mobile number<input type="text" inputmode="numeric" maxlength="10" value="' + esc(f.phone) + '" oninput="A2.field(\'phone\',this.value)" placeholder="10 digits"></label><label style="flex:1">PIN code<input type="text" inputmode="numeric" maxlength="6" value="' + esc(f.pin) + '" oninput="A2.field(\'pin\',this.value)" placeholder="6 digits"></label></div>' +
-    '<label>Payment<select onchange="A2.field(\'pay\',this.value)">' + ['Pay on delivery', 'UPI (demo)'].map(function (o) { return '<option' + (o === f.pay ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select></label>' +
-    '<p class="mut" style="margin:0">Payments are simulated. No card or bank details are collected or stored.</p>' +
+    '<label>Payment<select onchange="A2.field(\'pay\',this.value)"><option selected>Pay on delivery</option></select></label>' +
+    '<p class="mut" style="margin:0">Payment is due on delivery. No online payment is collected.</p>' +
     (A2.applied ? '<div class="row"><span class="disc">' + esc(A2.applied.code) + ' applied</span><button class="linkbtn" onclick="A2.dropCoupon()">Remove</button></div>' :
       '<div><label>Coupon code</label><div class="cpn"><input type="text" id="cpn" maxlength="20" placeholder="Enter code" aria-label="Coupon code"><button class="btn alt" onclick="A2.coupon()">Apply</button></div>' + (A2.cmsg ? '<div class="err" style="margin:6px 0 0">' + esc(A2.cmsg) + '</div>' : '') + '</div>') +
     '<div class="sumrows"><div><span>Subtotal</span><span>' + inr(t.sub) + '</span></div>' + (t.disc ? '<div class="disc"><span>Coupon discount</span><span>−' + inr(t.disc) + '</span></div>' : '') +
@@ -175,7 +175,7 @@ window.place = function () {
   if (!/^[6-9]\d{9}$/.test(ph)) { toast('Enter a 10 digit mobile number', 3500); return; }
   if (!/^\d{6}$/.test(pin)) { toast('Enter a 6 digit PIN code', 3500); return; }
   var cn = staff() ? clean(f.cn, 60) : ''; if (staff() && !cn) { toast('Enter the customer name or phone'); return; }
-  var pay = ['Pay on delivery', 'UPI (demo)'].indexOf(f.pay) > -1 ? f.pay : 'Pay on delivery', items = [];
+  var pay = 'Pay on delivery', items = [];
   for (var i = 0; i < cart.length; i++) {
     var c = cart[i]; if (c.m !== mod) continue; var r = ref(c);
     if (!(c.q >= 1 && c.q <= r.v.s)) { toast(r.name + ' is low on stock'); return; }

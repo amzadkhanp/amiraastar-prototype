@@ -7,6 +7,7 @@
     "build": "node build.cjs",
     "serve": "node serve.cjs",
     "start": "node server.cjs",
+    "restore": "node scripts/restore-backup.cjs",
     "test": "playwright test"
   },
   "engines": { "node": ">=24.0.0" },

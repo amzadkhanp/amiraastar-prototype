@@ -4,12 +4,15 @@ const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
 const crypto = require('node:crypto');
+const net = require('node:net');
 const { DatabaseSync } = require('node:sqlite');
 
 const ROOT = __dirname;
 const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(ROOT, 'data'));
 const PORT = Number(process.env.PORT || 8000);
-const HOST = process.env.HOST || '127.0.0.1';
+const PRODUCTION = process.env.NODE_ENV === 'production';
+const STORE_OPEN = !PRODUCTION || process.env.STORE_OPEN === 'true';
+const HOST = process.env.HOST || (PRODUCTION ? '0.0.0.0' : '127.0.0.1');
 const SESSION_MS = 8 * 60 * 60 * 1000;
 const HASH_N = 32768;
 const HASH_R = 8;
@@ -128,12 +131,27 @@ function sessionFor(req) {
 }
 function publicState(user) {
   const out = clone(state);
+  out.runtime = { storeOpen: STORE_OPEN };
   out.users = user && user.role === 'admin' ? state.users.map(publicUser) : [];
   out.invites = user && user.role === 'admin' ? out.invites : [];
   out.spent = user && user.role === 'admin' ? out.spent : [];
   out.audit = user && user.role === 'admin' ? out.audit : [];
   out.lock = user && user.role === 'admin' ? loginLockView() : {};
   out.settings.demo = 0;
+  if (!STORE_OPEN && !(user && user.role === 'admin')) {
+    out.rice = [];
+    out.hw = [];
+    out.ap = [];
+    out.agencies = [];
+    out.machines = [];
+    out.stockLog = [];
+    out.reviews = [];
+    out.coupons = [];
+    for (const card of Object.values(out.cards || {})) {
+      card.on = 0;
+      card.desc = 'The store is preparing to open.';
+    }
+  }
   if (!user) {
     out.orders = [];
     out.exp = [];
@@ -166,11 +184,11 @@ function auditEvent(actor, action, detail, bad = 0) {
   state.audit = state.audit.slice(0, 300);
 }
 function setCookie(res, token, req) {
-  const secure = Boolean(req.socket.encrypted);
+  const secure = PRODUCTION || Boolean(req.socket.encrypted);
   res.setHeader('Set-Cookie', `amira_session=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${Math.floor(SESSION_MS / 1000)}${secure ? '; Secure' : ''}`);
 }
 function clearCookie(res, req) {
-  const secure = Boolean(req.socket.encrypted);
+  const secure = PRODUCTION || Boolean(req.socket.encrypted);
   res.setHeader('Set-Cookie', `amira_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${secure ? '; Secure' : ''}`);
 }
 function parseCookies(text = '') {
@@ -215,7 +233,11 @@ function rateLimit(table, key, limit, windowMs) {
   table.set(key, row);
   return row.count <= limit ? null : Math.ceil((row.until - now) / 1000);
 }
-function requestIp(req) { return req.socket.remoteAddress || 'local'; }
+function requestIp(req) {
+  const forwarded = process.env.TRUST_CF_CONNECTING_IP === '1' ? req.headers['cf-connecting-ip'] : '';
+  if (typeof forwarded === 'string' && net.isIP(forwarded)) return forwarded;
+  return req.socket.remoteAddress || 'local';
+}
 function addSession(req, res, user) {
   const token = createSession(user);
   setCookie(res, token, req);
@@ -247,6 +269,7 @@ function applyStockItem(item, amount) {
   }
 }
 function makeOrder(input, user, isStaff) {
+  if (!STORE_OPEN) throw Object.assign(new Error('The store is being prepared and is not accepting orders yet.'), { status: 503, code: 'store_closed' });
   const rawItems = Array.isArray(input.items) ? input.items : [];
   if (!rawItems.length || rawItems.length > 100) throw Object.assign(new Error('Add at least one available item.'), { status: 400 });
   const items = rawItems.map(itemFor);
@@ -277,7 +300,7 @@ function makeOrder(input, user, isStaff) {
     by: isStaff ? user.name : '', items, sub, disc, coupon, fee,
     gst: Math.round(after * (mod === 'rice' ? 0.05 : 0.18) / (1 + (mod === 'rice' ? 0.05 : 0.18))),
     total: after + fee, status: 'placed', addr: clean(input.addr, 300), phone: clean(input.phone, 15), pin: clean(input.pin, 6),
-    pay: input.pay === 'UPI (demo)' ? 'UPI (demo)' : 'Pay on delivery', paid: 0,
+    pay: 'Pay on delivery', paid: 0,
     ts: now, date: new Date(now).toLocaleString('en-IN'), eta: now + 3 * 86400000, tl: [{ s: 'placed', t: now }]
   };
   if (!order.addr || (!isStaff && (!/^[6-9]\d{9}$/.test(order.phone) || !/^\d{6}$/.test(order.pin)))) {
@@ -419,7 +442,17 @@ function mergePersonal(input, user) {
 function mergeAdmin(input, user, profileInput) {
   const oldUsers = new Map(state.users.map((x) => [x.u, x]));
   const next = clone(input);
-  next.users = (Array.isArray(input.users) ? input.users : []).filter((x) => x && validUser(x.u) && VALID_ROLES.includes(x.role)).map((x) => {
+  delete next.runtime;
+  const requestedUsers = (Array.isArray(input.users) ? input.users : []).filter((x) => x && validUser(x.u) && VALID_ROLES.includes(x.role));
+  const usernames = new Set(), emails = new Set();
+  for (const candidate of requestedUsers) {
+    if (usernames.has(candidate.u)) throw Object.assign(new Error('The account list contains a duplicate username.'), { status: 400, code: 'duplicate_username' });
+    usernames.add(candidate.u);
+    const email = clean(candidate.email || '', 80).toLowerCase();
+    if (email && (!validEmail(email) || emails.has(email))) throw Object.assign(new Error('The account list contains an invalid or duplicate email address.'), { status: 400, code: 'duplicate_email' });
+    if (email) emails.add(email);
+  }
+  next.users = requestedUsers.map((x) => {
     const old = oldUsers.get(x.u);
     if (!old) return null; // User creation has a dedicated password-checked endpoint.
     return {
@@ -471,6 +504,7 @@ function protectHeaders(res) {
   res.setHeader('Referrer-Policy', 'no-referrer');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  if (PRODUCTION) res.setHeader('Strict-Transport-Security', 'max-age=15552000');
 }
 function serveApp(res) {
   const file = path.join(ROOT, 'AmiraASTAR.html');
@@ -491,6 +525,24 @@ async function handleApi(req, res, pathname) {
     if (!auth) return sendError(res, 401, 'Sign in to continue.', 'unauthorized');
     auth.session.revision = revision;
     return sendJson(res, 200, { user: publicUser(auth.user), state: publicState(auth.user), revision });
+  }
+  if (req.method === 'GET' && pathname === '/api/admin/backup') {
+    const auth = sessionFor(req);
+    if (!auth) return sendError(res, 401, 'Sign in to continue.', 'unauthorized');
+    if (!isAdmin(auth.user)) return sendError(res, 403, 'Admin access is required.', 'forbidden');
+    // Flush WAL pages, then take a synchronous snapshot so no request can write mid-copy.
+    const checkpoint = sql.prepare('PRAGMA wal_checkpoint(FULL)').get();
+    if (!checkpoint || Number(checkpoint.busy) !== 0) return sendError(res, 503, 'The database is busy. Try the backup again in a moment.', 'backup_busy');
+    const snapshot = fs.readFileSync(dbFile);
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    res.writeHead(200, {
+      'Content-Type': 'application/vnd.sqlite3',
+      'Content-Disposition': `attachment; filename="amiraastar-backup-${stamp}.sqlite"`,
+      'Cache-Control': 'no-store, private',
+      'X-Content-Type-Options': 'nosniff',
+      'Content-Length': snapshot.length
+    });
+    return res.end(snapshot);
   }
   if (!['POST', 'PUT'].includes(req.method)) return sendError(res, 404, 'Not found.');
   if (rejectIfNotJson(req, res)) return;
@@ -522,6 +574,7 @@ async function handleApi(req, res, pathname) {
     const email = clean(body.email, 80).toLowerCase();
     const name = clean(body.name, 60);
     const role = body.role === 'employee' ? 'employee' : 'customer';
+    if (!STORE_OPEN && role === 'customer') return sendError(res, 503, 'The store is still being prepared. Customer sign-up is not open yet.', 'store_closed');
     const phone = clean(body.phone, 15);
     const password = String(body.password || '');
     if (!name || !validUser(username) || !validEmail(email)) return sendError(res, 400, 'Enter a valid name, email and username.', 'invalid_signup');
@@ -594,25 +647,32 @@ async function handleApi(req, res, pathname) {
     }
     const input = body.state;
     const idMap = [];
-    if (isAdmin(auth.user)) {
-      const requestedLocks = input.lock || {};
-      for (const username of Object.keys(loginLockView())) {
-        if (requestedLocks[username]) continue;
-        for (const key of loginAttempts.keys()) {
-          if (key.split('|').pop() === username) loginAttempts.delete(key);
-        }
-        auditEvent(auth.user, 'unlock', username);
+    const previousState = state;
+    const unlockUsers = [];
+    state = clone(previousState);
+    try {
+      const transactionUser = userByName(auth.user.u);
+      if (isAdmin(transactionUser)) {
+        const requestedLocks = input.lock || {};
+        for (const username of Object.keys(loginLockView())) if (!requestedLocks[username]) unlockUsers.push(username);
+        mergeAdmin(input, transactionUser, body.profile);
       }
-      mergeAdmin(input, auth.user, body.profile);
+      else if (isEmployee(transactionUser)) mergeEmployee({ ...input, profile: body.profile }, transactionUser, idMap);
+      else mergeCustomer({ ...input, profile: body.profile }, transactionUser, idMap);
+      state.settings.demo = 0;
+      for (const username of unlockUsers) auditEvent(userByName(auth.user.u), 'unlock', username);
+      const currentUser = userByName(auth.user.u);
+      auditEvent(currentUser, 'data-updated', 'app data saved');
+      persist(state);
+      for (const username of unlockUsers) {
+        for (const key of loginAttempts.keys()) if (key.split('|').pop() === username) loginAttempts.delete(key);
+      }
+    } catch (error) {
+      state = previousState;
+      throw error;
     }
-    else if (isEmployee(auth.user)) mergeEmployee({ ...input, profile: body.profile }, auth.user, idMap);
-    else mergeCustomer({ ...input, profile: body.profile }, auth.user, idMap);
-    state.settings.demo = 0;
-    const currentUser = userByName(auth.user.u);
-    auditEvent(currentUser, 'data-updated', 'app data saved');
-    persist(state);
     auth.session.revision = revision;
-    return sendJson(res, 200, { revision, idMap, user: publicUser(currentUser) });
+    return sendJson(res, 200, { revision, idMap, user: publicUser(userByName(auth.user.u)) });
   }
   return sendError(res, 404, 'Not found.');
 }

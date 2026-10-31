@@ -266,7 +266,7 @@ function cartHtml(){var t=0,n=0,q=0,h='';
   cart.forEach(function(c,i){if(c.m!==mod)return;n++;q+=c.q;var r=ref(c);t+=r.v.p*c.q;
     h+='<div class="li"><div><div class="nm">'+esc(r.name)+'</div><div class="mut">'+esc(r.label)+' · '+inr(r.v.p)+' each</div></div><div class="pr">'+inr(r.v.p*c.q)+'</div><div class="qty"><button onclick="chg('+i+',-1)" aria-label="Fewer">−</button><span>'+c.q+'</span><button onclick="chg('+i+',1)" aria-label="More">+</button></div><div style="text-align:right"><button class="btn alt" style="padding:4px 10px;font-size:13px" onclick="chg('+i+',-'+c.q+')">Remove</button></div></div>'});
   if(!n)return '<div class="cartp"><h3>Your cart</h3><p class="mut" style="margin:0">Nothing here yet. Add '+(mod==='rice'?'a bag of rice':'an item')+' to start an order.</p></div>';
-  return '<div class="cartp"><h3>Your cart ('+q+')</h3><div>'+h+'</div>'+(staff()?'<label>Customer name or phone<input type="text" value="'+esc(form.cn)+'" oninput="form.cn=this.value" placeholder="Who is this order for?"></label>':'')+'<label>Delivery address<textarea rows="3" oninput="form.addr=this.value" placeholder="House no, street, area, Bengaluru">'+esc(form.addr)+'</textarea></label><label>Payment<select onchange="form.pay=this.value">'+['Pay on delivery','UPI (demo)'].map(function(o){return '<option'+(o===form.pay?' selected':'')+'>'+o+'</option>'}).join('')+'</select></label><div class="tot"><span>Total</span><span>'+inr(t)+'</span></div><button class="btn" style="width:100%;padding:12px" onclick="place()">Place order</button></div>'}
+  return '<div class="cartp"><h3>Your cart ('+q+')</h3><div>'+h+'</div>'+(staff()?'<label>Customer name or phone<input type="text" value="'+esc(form.cn)+'" oninput="form.cn=this.value" placeholder="Who is this order for?"></label>':'')+'<label>Delivery address<textarea rows="3" oninput="form.addr=this.value" placeholder="House no, street, area, Bengaluru">'+esc(form.addr)+'</textarea></label><label>Payment<select onchange="form.pay=this.value"><option selected>Pay on delivery</option></select></label><div class="tot"><span>Total</span><span>'+inr(t)+'</span></div><button class="btn" style="width:100%;padding:12px" onclick="place()">Place order</button></div>'}
 function cartBar(){var q=0,t=0;cart.forEach(function(c){if(c.m===mod){q+=c.q;t+=ref(c).v.p*c.q}});
   return q?'<button class="cartbar" onclick="document.getElementById(\'cart\').scrollIntoView({behavior:\'smooth\'})"><span>View cart ('+q+')</span><span>'+inr(t)+'</span></button>':''}
 function shopWrap(list){return '<div class="shop"><div>'+list+'</div><aside class="side" id="cart">'+cartHtml()+'</aside></div>'+cartBar()}
@@ -810,6 +810,13 @@ window.toast = function (m, ms) { document.querySelectorAll('.toast').forEach(fu
       return payload;
     });
   }
+  A2.downloadBackup = function () {
+    if (!me || me.role !== 'admin') return message('Admin access is required.');
+    var a = document.createElement('a');
+    a.href = '/api/admin/backup';
+    a.download = 'amiraastar-backup.sqlite';
+    document.body.appendChild(a); a.click(); a.remove();
+  };
   function install(payload) {
     if (!payload || !payload.state) throw new Error('The server returned incomplete app data.');
     db = payload.state;
@@ -886,6 +893,23 @@ window.toast = function (m, ms) { document.querySelectorAll('.toast').forEach(fu
     baseRender();
     var demo = document.getElementById('demoNote');
     if (demo) demo.remove();
+    var app = document.getElementById('app'), closed = !db.runtime || db.runtime.storeOpen !== true, oldClosed = document.getElementById('storeClosedNote');
+    if (oldClosed) oldClosed.remove();
+    if (!me && closed && app) {
+      var closedNote = document.createElement('div');
+      closedNote.id = 'storeClosedNote'; closedNote.className = 'banner'; closedNote.setAttribute('role', 'status');
+      closedNote.textContent = 'The store is being prepared. Customer sign-up and ordering will open after the administrator completes setup.';
+      app.insertBefore(closedNote, app.firstChild);
+      var signupButton = document.querySelector('.login button[onclick="setSignup(true)"]');
+      var inviteButton = document.querySelector('.login button[onclick="setInv(true)"]');
+      if (signupButton) signupButton.remove();
+      if (inviteButton) inviteButton.remove();
+    } else if (me && me.role === 'admin' && closed && app) {
+      var adminNote = document.createElement('div');
+      adminNote.id = 'storeClosedNote'; adminNote.className = 'banner'; adminNote.setAttribute('role', 'status');
+      adminNote.textContent = 'Customer signup and ordering are closed. Finish setup, then set STORE_OPEN=true in the hosting service.';
+      app.insertBefore(adminNote, app.firstChild);
+    }
     var header = document.querySelector('header');
     if (me && header && !header.querySelector('.live-storage')) {
       var label = document.createElement('span');
@@ -901,7 +925,7 @@ window.toast = function (m, ms) { document.querySelectorAll('.toast').forEach(fu
         note.className = 'banner';
         note.id = 'liveNote';
         note.setAttribute('role', 'note');
-        note.textContent = 'Live mode. Accounts and business records are saved in the SQLite database on this laptop.';
+        note.textContent = 'Live mode. Accounts and business records are saved in the SQLite database.';
         login.insertBefore(note, login.firstChild.nextSibling);
       }
     }
@@ -1340,8 +1364,8 @@ window.cartHtml = function () {
     (staff() ? '<label>Customer name or phone<input type="text" maxlength="60" value="' + esc(f.cn) + '" oninput="A2.field(\'cn\',this.value)" placeholder="Who is this order for?"></label>' : '') +
     '<label>Delivery address<textarea rows="3" maxlength="300" oninput="A2.field(\'addr\',this.value)" placeholder="House no, street, area, Bengaluru">' + esc(f.addr) + '</textarea></label>' +
     '<div class="row" style="gap:8px"><label style="flex:1">Mobile number<input type="text" inputmode="numeric" maxlength="10" value="' + esc(f.phone) + '" oninput="A2.field(\'phone\',this.value)" placeholder="10 digits"></label><label style="flex:1">PIN code<input type="text" inputmode="numeric" maxlength="6" value="' + esc(f.pin) + '" oninput="A2.field(\'pin\',this.value)" placeholder="6 digits"></label></div>' +
-    '<label>Payment<select onchange="A2.field(\'pay\',this.value)">' + ['Pay on delivery', 'UPI (demo)'].map(function (o) { return '<option' + (o === f.pay ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select></label>' +
-    '<p class="mut" style="margin:0">Payments are simulated. No card or bank details are collected or stored.</p>' +
+    '<label>Payment<select onchange="A2.field(\'pay\',this.value)"><option selected>Pay on delivery</option></select></label>' +
+    '<p class="mut" style="margin:0">Payment is due on delivery. No online payment is collected.</p>' +
     (A2.applied ? '<div class="row"><span class="disc">' + esc(A2.applied.code) + ' applied</span><button class="linkbtn" onclick="A2.dropCoupon()">Remove</button></div>' :
       '<div><label>Coupon code</label><div class="cpn"><input type="text" id="cpn" maxlength="20" placeholder="Enter code" aria-label="Coupon code"><button class="btn alt" onclick="A2.coupon()">Apply</button></div>' + (A2.cmsg ? '<div class="err" style="margin:6px 0 0">' + esc(A2.cmsg) + '</div>' : '') + '</div>') +
     '<div class="sumrows"><div><span>Subtotal</span><span>' + inr(t.sub) + '</span></div>' + (t.disc ? '<div class="disc"><span>Coupon discount</span><span>−' + inr(t.disc) + '</span></div>' : '') +
@@ -1359,7 +1383,7 @@ window.place = function () {
   if (!/^[6-9]\d{9}$/.test(ph)) { toast('Enter a 10 digit mobile number', 3500); return; }
   if (!/^\d{6}$/.test(pin)) { toast('Enter a 6 digit PIN code', 3500); return; }
   var cn = staff() ? clean(f.cn, 60) : ''; if (staff() && !cn) { toast('Enter the customer name or phone'); return; }
-  var pay = ['Pay on delivery', 'UPI (demo)'].indexOf(f.pay) > -1 ? f.pay : 'Pay on delivery', items = [];
+  var pay = 'Pay on delivery', items = [];
   for (var i = 0; i < cart.length; i++) {
     var c = cart[i]; if (c.m !== mod) continue; var r = ref(c);
     if (!(c.q >= 1 && c.q <= r.v.s)) { toast(r.name + ' is low on stock'); return; }
@@ -1776,7 +1800,7 @@ function secTab() {
   h += '<div class="card ragtile ' + LV[w].k + '" style="margin-bottom:14px"><div class="ink mut">Overall</div><div style="margin:6px 0">' + ragBadge({ lv: w, why: LV[w].w }) + '</div><div class="ink mut">' + n.red + ' red · ' + n.amber + ' amber · ' + n.green + ' green</div></div>';
   h += '<div class="card" style="margin-bottom:14px">';
   cs2.forEach(function (r) { h += '<div class="ragrow">' + ragBadge(r) + '<div><div><b>' + esc(r.n) + '</b></div><div>' + esc(r.why) + '</div>' + (r.lv !== 'green' ? '<div class="mut">Fix: ' + esc(FIX[r.n] || '') + '</div>' : '') + '</div></div>'; });
-  h += '</div><div class="card" style="margin-bottom:14px"><b>Controls</b><div class="row" style="margin-top:8px;justify-content:flex-start;flex-wrap:wrap"><button class="btn alt" aria-pressed="' + (db.settings.demo ? 'true' : 'false') + '" onclick="A2.setDemo(' + (db.settings.demo ? 0 : 1) + ')">Demo mode: ' + (db.settings.demo ? 'On (turn off)' : 'Off (turn on)') + '</button><label class="mut" style="display:flex;gap:6px;align-items:center">Idle sign-out (minutes)<input type="number" min="1" max="60" style="width:80px" value="' + N(db.settings.idleMin, 15) + '" onchange="A2.setIdle(this.value)"></label></div></div>';
+  h += '</div><div class="card" style="margin-bottom:14px"><b>Controls</b><div class="row" style="margin-top:8px;justify-content:flex-start;flex-wrap:wrap">' + (window.AMIRA_LIVE ? '<button class="btn alt" onclick="A2.downloadBackup()">Download database backup</button>' : '<button class="btn alt" aria-pressed="' + (db.settings.demo ? 'true' : 'false') + '" onclick="A2.setDemo(' + (db.settings.demo ? 0 : 1) + ')">Demo mode: ' + (db.settings.demo ? 'On (turn off)' : 'Off (turn on)') + '</button>') + '<label class="mut" style="display:flex;gap:6px;align-items:center">Idle sign-out (minutes)<input type="number" min="1" max="60" style="width:80px" value="' + N(db.settings.idleMin, 15) + '" onchange="A2.setIdle(this.value)"></label></div>' + (window.AMIRA_LIVE ? '<p class="mut" style="margin:8px 0 0">The backup contains account hashes and business records. Store it somewhere private.</p>' : '') + '</div>';
   var locked = Object.keys(db.lock).filter(function (k) { return db.lock[k].until > Date.now(); });
   if (locked.length) { h += '<div class="card" style="margin-bottom:14px"><b>Locked names</b>'; locked.forEach(function (k) { h += '<div class="row" style="margin-top:6px"><span class="mono">' + esc(k) + '</span><button class="btn alt" onclick="A2.unlock(\'' + esc(k) + '\')">Unlock</button></div>'; }); h += '</div>'; }
   h += '<div class="card tw" style="margin-bottom:14px"><b>Accounts</b><table style="margin-top:8px"><tr><th>User</th><th>Role</th><th>Password</th><th></th></tr>';
@@ -1849,7 +1873,7 @@ window.render = function () {
     if (A2.force) { var all = hd.querySelector('button[onclick="home()"]'); if (all) all.remove(); }
     else if (out && mod !== 'acct') { var b = document.createElement('button'); b.className = 'btn'; b.textContent = 'Account'; b.setAttribute('onclick', 'A2.openAcct()'); hd.insertBefore(b, out); }
   }
-  if (!me && !document.getElementById('demoNote')) {
+  if (!window.AMIRA_LIVE && !me && !document.getElementById('demoNote')) {
     var lc = document.querySelector('.login .card');
     if (lc) lc.insertAdjacentHTML('beforebegin', '<p class="banner" id="demoNote" role="note"><b>Demo only.</b> Everything you enter stays in this browser on your device and is not sent anywhere. Please do not enter real personal information.</p>');
   }

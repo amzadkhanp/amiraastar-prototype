@@ -21,7 +21,7 @@ function secTab() {
   h += '<div class="card ragtile ' + LV[w].k + '" style="margin-bottom:14px"><div class="ink mut">Overall</div><div style="margin:6px 0">' + ragBadge({ lv: w, why: LV[w].w }) + '</div><div class="ink mut">' + n.red + ' red · ' + n.amber + ' amber · ' + n.green + ' green</div></div>';
   h += '<div class="card" style="margin-bottom:14px">';
   cs2.forEach(function (r) { h += '<div class="ragrow">' + ragBadge(r) + '<div><div><b>' + esc(r.n) + '</b></div><div>' + esc(r.why) + '</div>' + (r.lv !== 'green' ? '<div class="mut">Fix: ' + esc(FIX[r.n] || '') + '</div>' : '') + '</div></div>'; });
-  h += '</div><div class="card" style="margin-bottom:14px"><b>Controls</b><div class="row" style="margin-top:8px;justify-content:flex-start;flex-wrap:wrap"><button class="btn alt" aria-pressed="' + (db.settings.demo ? 'true' : 'false') + '" onclick="A2.setDemo(' + (db.settings.demo ? 0 : 1) + ')">Demo mode: ' + (db.settings.demo ? 'On (turn off)' : 'Off (turn on)') + '</button><label class="mut" style="display:flex;gap:6px;align-items:center">Idle sign-out (minutes)<input type="number" min="1" max="60" style="width:80px" value="' + N(db.settings.idleMin, 15) + '" onchange="A2.setIdle(this.value)"></label></div></div>';
+  h += '</div><div class="card" style="margin-bottom:14px"><b>Controls</b><div class="row" style="margin-top:8px;justify-content:flex-start;flex-wrap:wrap">' + (window.AMIRA_LIVE ? '<button class="btn alt" onclick="A2.downloadBackup()">Download database backup</button>' : '<button class="btn alt" aria-pressed="' + (db.settings.demo ? 'true' : 'false') + '" onclick="A2.setDemo(' + (db.settings.demo ? 0 : 1) + ')">Demo mode: ' + (db.settings.demo ? 'On (turn off)' : 'Off (turn on)') + '</button>') + '<label class="mut" style="display:flex;gap:6px;align-items:center">Idle sign-out (minutes)<input type="number" min="1" max="60" style="width:80px" value="' + N(db.settings.idleMin, 15) + '" onchange="A2.setIdle(this.value)"></label></div>' + (window.AMIRA_LIVE ? '<p class="mut" style="margin:8px 0 0">The backup contains account hashes and business records. Store it somewhere private.</p>' : '') + '</div>';
   var locked = Object.keys(db.lock).filter(function (k) { return db.lock[k].until > Date.now(); });
   if (locked.length) { h += '<div class="card" style="margin-bottom:14px"><b>Locked names</b>'; locked.forEach(function (k) { h += '<div class="row" style="margin-top:6px"><span class="mono">' + esc(k) + '</span><button class="btn alt" onclick="A2.unlock(\'' + esc(k) + '\')">Unlock</button></div>'; }); h += '</div>'; }
   h += '<div class="card tw" style="margin-bottom:14px"><b>Accounts</b><table style="margin-top:8px"><tr><th>User</th><th>Role</th><th>Password</th><th></th></tr>';
@@ -94,7 +94,7 @@ window.render = function () {
     if (A2.force) { var all = hd.querySelector('button[onclick="home()"]'); if (all) all.remove(); }
     else if (out && mod !== 'acct') { var b = document.createElement('button'); b.className = 'btn'; b.textContent = 'Account'; b.setAttribute('onclick', 'A2.openAcct()'); hd.insertBefore(b, out); }
   }
-  if (!me && !document.getElementById('demoNote')) {
+  if (!window.AMIRA_LIVE && !me && !document.getElementById('demoNote')) {
     var lc = document.querySelector('.login .card');
     if (lc) lc.insertAdjacentHTML('beforebegin', '<p class="banner" id="demoNote" role="note"><b>Demo only.</b> Everything you enter stays in this browser on your device and is not sent anywhere. Please do not enter real personal information.</p>');
   }

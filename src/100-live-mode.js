@@ -30,6 +30,13 @@
       return payload;
     });
   }
+  A2.downloadBackup = function () {
+    if (!me || me.role !== 'admin') return message('Admin access is required.');
+    var a = document.createElement('a');
+    a.href = '/api/admin/backup';
+    a.download = 'amiraastar-backup.sqlite';
+    document.body.appendChild(a); a.click(); a.remove();
+  };
   function install(payload) {
     if (!payload || !payload.state) throw new Error('The server returned incomplete app data.');
     db = payload.state;
@@ -106,6 +113,23 @@
     baseRender();
     var demo = document.getElementById('demoNote');
     if (demo) demo.remove();
+    var app = document.getElementById('app'), closed = !db.runtime || db.runtime.storeOpen !== true, oldClosed = document.getElementById('storeClosedNote');
+    if (oldClosed) oldClosed.remove();
+    if (!me && closed && app) {
+      var closedNote = document.createElement('div');
+      closedNote.id = 'storeClosedNote'; closedNote.className = 'banner'; closedNote.setAttribute('role', 'status');
+      closedNote.textContent = 'The store is being prepared. Customer sign-up and ordering will open after the administrator completes setup.';
+      app.insertBefore(closedNote, app.firstChild);
+      var signupButton = document.querySelector('.login button[onclick="setSignup(true)"]');
+      var inviteButton = document.querySelector('.login button[onclick="setInv(true)"]');
+      if (signupButton) signupButton.remove();
+      if (inviteButton) inviteButton.remove();
+    } else if (me && me.role === 'admin' && closed && app) {
+      var adminNote = document.createElement('div');
+      adminNote.id = 'storeClosedNote'; adminNote.className = 'banner'; adminNote.setAttribute('role', 'status');
+      adminNote.textContent = 'Customer signup and ordering are closed. Finish setup, then set STORE_OPEN=true in the hosting service.';
+      app.insertBefore(adminNote, app.firstChild);
+    }
     var header = document.querySelector('header');
     if (me && header && !header.querySelector('.live-storage')) {
       var label = document.createElement('span');
@@ -121,7 +145,7 @@
         note.className = 'banner';
         note.id = 'liveNote';
         note.setAttribute('role', 'note');
-        note.textContent = 'Live mode. Accounts and business records are saved in the SQLite database on this laptop.';
+        note.textContent = 'Live mode. Accounts and business records are saved in the SQLite database.';
         login.insertBefore(note, login.firstChild.nextSibling);
       }
     }

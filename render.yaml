@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: amiraastar
+    runtime: node
+    region: singapore
+    plan: 0.5c-512mb
+    buildCommand: node build.cjs
+    startCommand: node server.cjs
+    healthCheckPath: /api/health
+    numInstances: 1
+    disk:
+      name: amiraastar-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATA_DIR
+        value: /var/data
+      - key: TRUST_CF_CONNECTING_IP
+        value: "1"
+      - key: STORE_OPEN
+        value: "false"
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_NAME
+        value: AmiraASTAR Admin

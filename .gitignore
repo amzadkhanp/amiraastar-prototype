@@ -2,8 +2,14 @@ node_modules/
 test-output/
 shots/
 parked/
+work/prod-smoke-data/
+work/prod-smoke-restored/
+work/prod-smoke-backup.sqlite
+work/prod-smoke-backup.sqlite-*
 *.log
 .env
 data/*.sqlite
 data/*.sqlite-*
 data/*.db
+data/amiraastar-pre-restore-*.sqlite
+data/amiraastar.sqlite.before-restore-*
