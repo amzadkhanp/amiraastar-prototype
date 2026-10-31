@@ -1,0 +1,14 @@
+{
+  "name": "amiraastar-prototype",
+  "version": "2.0.0",
+  "private": true,
+  "description": "AmiraASTAR business app with a local SQLite-backed server edition and static prototype preview.",
+  "scripts": {
+    "build": "node build.cjs",
+    "serve": "node serve.cjs",
+    "start": "node server.cjs",
+    "test": "playwright test"
+  },
+  "engines": { "node": ">=24.0.0" },
+  "devDependencies": { "@playwright/test": "1.62.1" }
+}

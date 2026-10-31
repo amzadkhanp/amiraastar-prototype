@@ -1,0 +1,56 @@
+/* ---- AmiraASTAR v2 additions ---- */
+:root{--rag-g:#1f7a45;--rag-a:#9a5b00;--rag-r:#b3261e;--rag-gb:#e3f3ea;--rag-ab:#fff1d6;--rag-rb:#fde4e2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--rag-g:#6fd49a;--rag-a:#f0b93a;--rag-r:#ff8a80;--rag-gb:#12301f;--rag-ab:#33280a;--rag-rb:#3a1512}}
+:root[data-theme="dark"]{--rag-g:#6fd49a;--rag-a:#f0b93a;--rag-r:#ff8a80;--rag-gb:#12301f;--rag-ab:#33280a;--rag-rb:#3a1512}
+/* red / amber / green: a shape and a word always travel with the colour */
+.rag{display:inline-flex;align-items:center;gap:5px;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;border:1px solid currentColor;white-space:nowrap}
+.rag i{font-style:normal;font-size:11px}
+.rag-green{color:var(--rag-g);background:var(--rag-gb)}
+.rag-amber{color:var(--rag-a);background:var(--rag-ab)}
+.rag-red{color:var(--rag-r);background:var(--rag-rb)}
+.ragtile{border-left:8px solid currentColor;padding:12px 14px}
+.ragtile.g{color:var(--rag-g)}.ragtile.a{color:var(--rag-a)}.ragtile.r{color:var(--rag-r)}
+.ragtile .ink{color:var(--ink)}
+.ragrow{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line)}
+.ragrow:last-child{border-bottom:0}
+.ragrow .rag{flex:0 0 auto;margin-top:1px}
+.glance{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:16px}
+.glance button{text-align:left;background:var(--surf);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.glance .n{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+/* shop toolbar and product extras */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin:0 0 14px}
+.toolbar label{font-size:13px;color:var(--mut);display:flex;flex-direction:column;gap:4px}
+.toolbar input[type=search],.toolbar select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surf);min-width:150px}
+.toolbar .grow{flex:1;min-width:180px}
+.toolbar .grow input{width:100%}
+.heart{background:none;border:1px solid var(--line);border-radius:8px;padding:2px 9px;font-size:18px;line-height:1.4;color:var(--mut)}
+.heart.on{color:var(--rag-r);border-color:var(--rag-r)}
+.stars{color:var(--acc);letter-spacing:1px;font-size:14px}
+.linkbtn{background:none;border:0;padding:0;color:var(--pri);text-decoration:underline;font-size:13px}
+@media (prefers-color-scheme:dark){.linkbtn{color:var(--acc)}}
+.sumrows{display:flex;flex-direction:column;gap:4px;font-size:14px}
+.sumrows div{display:flex;justify-content:space-between}
+.sumrows .mut{font-size:13px}
+.disc{color:var(--rag-g);font-weight:700}
+.cpn{display:flex;gap:6px}.cpn input{margin:0!important}
+/* order timeline */
+.tl{display:flex;gap:0;margin:10px 0 4px;padding:0;list-style:none;font-size:12px}
+.tl li{flex:1;text-align:center;color:var(--mut);position:relative;padding-top:18px}
+.tl li:before{content:"";position:absolute;top:4px;left:50%;width:10px;height:10px;border-radius:50%;background:var(--line);transform:translateX(-50%);z-index:1}
+.tl li:after{content:"";position:absolute;top:8px;left:-50%;width:100%;height:2px;background:var(--line)}
+.tl li:first-child:after{display:none}
+.tl li.done{color:var(--ink);font-weight:600}.tl li.done:before,.tl li.done:after{background:var(--ok)}
+.tl li.stop{color:var(--rag-r)}.tl li.stop:before{background:var(--rag-r)}
+.inv{text-align:left;max-width:640px;width:100%;font-size:14px}
+.inv h3{margin:0 0 4px}.inv table{margin:10px 0}.inv .tot{font-size:16px}
+.stk{border:1px solid var(--line);border-radius:8px;padding:10px;margin:6px 0;background:var(--bg)}
+.starpick{display:flex;gap:4px;justify-content:center;margin:8px 0}
+.starpick button{background:none;border:0;font-size:30px;color:var(--line);padding:0 2px}
+.starpick button.on{color:var(--acc)}
+.banner{padding:10px 14px;border-radius:10px;margin-bottom:14px;border:1px solid var(--rag-a);background:var(--rag-ab);color:var(--ink)}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:4px 12px;font-size:14px}
+.kv dt{color:var(--mut)}.kv dd{margin:0}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:12px}
+@media print{header,nav,.toast,.cartbar,button{display:none!important}.modal{position:static;background:none;padding:0}.mbox{max-height:none;box-shadow:none}body{background:#fff;color:#000}}
+.sr{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.grid2f{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:14px}

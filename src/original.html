@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AmiraASTAR</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef0f2;--surf:#fff;--ink:#16212b;--mut:#5b6a76;--line:#d6dde3;--pri:#1d3b57;--pri-ink:#fff;--acc:#e6a817;--bad:#b3261e;--ok:#1f7a45;--rice:#1f5a3f;--hw:#8a4b12;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e161d;--surf:#16212b;--ink:#e8eef3;--mut:#9aabb8;--line:#2a3a47;--pri:#10253a;--acc:#f0b93a;--bad:#ff8a80;--ok:#6fd49a;--rice:#5bbf8a;--hw:#e0a064}}
+:root[data-theme="dark"]{--bg:#0e161d;--surf:#16212b;--ink:#e8eef3;--mut:#9aabb8;--line:#2a3a47;--pri:#10253a;--acc:#f0b93a;--bad:#ff8a80;--ok:#6fd49a;--rice:#5bbf8a;--hw:#e0a064}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:16px}
+header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;background:var(--pri);color:#fff}
+header b{font-size:20px;font-weight:800;letter-spacing:-.3px;flex:1}
+header span{opacity:.85;font-size:13px}
+header .btn{background:rgba(255,255,255,.18);color:#fff;padding:6px 12px}
+.btn{background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:9px 16px;font-weight:600}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto}
+nav button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;color:var(--mut);font-weight:600;white-space:nowrap}
+nav button.on{color:var(--ink);border-color:var(--acc)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card h3{margin:0 0 2px;font-size:18px;font-weight:800}
+.mod{border-left:8px solid var(--c);padding:22px}
+.mod h3{font-size:26px;letter-spacing:-.5px}
+.mod .btn{background:var(--c);color:#fff;margin-top:14px}
+.mut{color:var(--mut);font-size:13px}
+.chips{display:flex;gap:6px;margin:12px 0}
+.chip{flex:1;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:7px 0;font-weight:600}
+.chip.on{background:var(--rice);color:#fff;border-color:var(--rice)}
+.chip:disabled{opacity:.35;text-decoration:line-through}
+.price{font-size:26px;font-weight:800}
+.row{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.qty{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px}
+.qty button{background:none;border:0;width:30px;height:32px;font-size:18px}
+.qty span{min-width:26px;text-align:center;font-weight:600}
+table{width:100%;border-collapse:collapse}
+.tw{overflow-x:auto}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:13px;color:var(--mut);font-weight:600}
+td input,td select,.row select{width:90px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+input[type=text],input[type=password],textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);margin:4px 0 12px}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;background:var(--bg);border:1px solid var(--line)}
+.badge.placed{border-color:var(--acc)}.badge.delivered{color:var(--ok);border-color:var(--ok)}.badge.cancelled,.badge.low{color:var(--bad);border-color:var(--bad)}
+.login{max-width:400px;margin:8vh auto}
+.login h1{font-size:34px;font-weight:800;letter-spacing:-1px;margin:0;line-height:1.1}
+.demo{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.cart{position:sticky;bottom:0;margin-top:16px;background:var(--surf);border:1px solid var(--line);border-top:3px solid var(--acc);border-radius:12px;padding:14px;box-shadow:0 -4px 16px rgba(0,0,0,.08)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:8px;z-index:9}
+.stat{font-size:28px;font-weight:800}
+.err{color:var(--bad);min-height:20px;margin:0 0 8px}
+h2{margin:0 0 12px;font-size:22px;font-weight:800}
+h4{margin:18px 0 8px;font-size:16px}
+.ops{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);display:flex;flex-direction:column;gap:6px}
+.ops input{padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);width:84px;display:block;margin-top:2px}
+.ef{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.ef label{font-size:13px;color:var(--mut);display:flex;flex-direction:column;gap:4px}
+.ef input,.ef select,.ef textarea{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);width:100%;margin:0}
+.ef .full{grid-column:1/-1}
+img.pod{width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--line);cursor:zoom-in}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:20;padding:16px}
+.mbox{background:var(--surf);border-radius:12px;padding:12px;max-width:min(92vw,720px);max-height:90vh;overflow:auto;text-align:center}
+.mbox img{max-width:100%;max-height:75vh;display:block;margin:0 auto 10px}
+.badge.submitted{border-color:var(--acc)}.badge.approved{color:var(--ok);border-color:var(--ok)}.badge.paid{color:var(--ok);border-color:var(--ok);font-weight:800}.badge.rejected{color:var(--bad);border-color:var(--bad)}
+.shop{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+.shop .grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.side{position:sticky;top:12px}
+.cartp{background:var(--surf);border:1px solid var(--line);border-top:3px solid var(--acc);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.cartp h3{margin:0;font-size:18px;font-weight:800}
+.li{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.li:last-child{border-bottom:0}
+.li .nm{font-weight:600}
+.li .pr{text-align:right;font-weight:600}
+.qty{display:inline-flex}
+.cartp label{display:block;font-size:13px;color:var(--mut)}
+.cartp textarea,.cartp input[type=text],.cartp select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);margin:4px 0 0}
+.tot{display:flex;justify-content:space-between;font-size:20px;font-weight:800;padding-top:4px}
+.cartbar{display:none}
+.filters{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:14px}
+.filters label{font-size:13px;color:var(--mut);display:flex;flex-direction:column;gap:4px}
+.filters input,.filters select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surf);width:auto}
+@media(max-width:860px){.shop{grid-template-columns:1fr}.side{position:static}.wrap{padding-bottom:84px}
+.cartbar{display:flex;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);border:0;border-radius:12px;padding:13px 16px;justify-content:space-between;font-weight:600;z-index:5}}
+.mod .btn.alt{background:transparent;color:var(--ink);margin:0}
+.sw{width:30px;height:30px;border-radius:50%;border:3px solid transparent;padding:0}.sw.on{border-color:var(--ink)}
+.dim{opacity:.6}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+var K='akma_v1',W=[10,20,25],CATS=['Iron & Steel','Cement','Sand & Aggregates','Pipes','Wire'];
+var USERS=[{u:'admin',p:'admin123',role:'admin',name:'Meera (Admin)'},{u:'employee',p:'emp123',role:'employee',name:'Ravi (Employee)'},{u:'customer',p:'cust123',role:'customer',name:'Anita (Customer)'}];
+function H(id,name,cat,unit,p,s,min){return{id:id,name:name,cat:cat,unit:unit,p:p,s:s,min:min,on:1}}
+function seed(){return{next:1001,orders:[],users:[],invites:[],cards:JSON.parse(JSON.stringify(CARDS0)),rice:[
+{id:1,name:'Sona Masoori',note:'Everyday medium-grain, soft and light',on:1,v:{10:{p:620,s:50},20:{p:1200,s:30},25:{p:1450,s:40}}},
+{id:2,name:'Basmati',note:'Long, aromatic grains for biryani and pulao',on:1,v:{10:{p:1100,s:20},20:{p:2150,s:15},25:{p:2600,s:10}}},
+{id:3,name:'Ponni Boiled',note:'Sturdy parboiled rice for daily meals',on:1,v:{10:{p:560,s:40},20:{p:1090,s:25},25:{p:1320,s:30}}},
+{id:4,name:'Idli Rice',note:'Short-grain, made for soft idli and dosa',on:1,v:{10:{p:540,s:35},20:{p:1050,s:20},25:{p:1270,s:0}}},
+{id:5,name:'Brown Rice',note:'Whole grain with the bran intact',on:1,v:{10:{p:780,s:12},20:{p:1520,s:8},25:{p:1850,s:6}}}],
+hw:[H(1,'TMT Bar Fe500D 8 mm','Iron & Steel','12 m rod',322,300,50),H(2,'TMT Bar Fe500D 10 mm','Iron & Steel','12 m rod',503,260,50),H(3,'TMT Bar Fe500D 12 mm','Iron & Steel','12 m rod',725,220,40),H(4,'TMT Bar Fe500D 16 mm','Iron & Steel','12 m rod',1290,120,30),H(5,'MS Angle 40x40x5 mm','Iron & Steel','6 m length',1150,60,15),
+H(6,'Cement OPC 53 Grade','Cement','50 kg bag',410,400,80),H(7,'Cement PPC','Cement','50 kg bag',385,520,80),
+H(8,'Rasi (river sand)','Sand & Aggregates','tonne',1800,40,10),H(9,'M-Sand','Sand & Aggregates','tonne',1200,60,10),
+H(10,'PVC Pipe 1 inch (ISI)','Pipes','6 m length',380,150,30),H(11,'PVC Drainage Pipe 4 inch','Pipes','6 m length',1150,70,15),H(12,'GI Pipe 1 inch (Medium)','Pipes','6 m length',1650,45,12),
+H(13,'MS Binding Wire 20 gauge','Wire','kg',78,500,100),H(14,'GI Wire 12 gauge','Wire','kg',95,250,50),H(15,'Welded Wire Mesh 6x3 ft','Wire','sheet',640,8,10)]}}
+var CARDS0={rice:{title:'RiceMarket',desc:'Sona Masoori, Basmati and more in 10, 20 and 25 kg bags, priced by variety and weight.',color:'#1f5a3f',on:1},hw:{title:'Hardware Inventory',desc:'Iron, cement, sand, pipes and wire with live stock and low-stock alerts.',color:'#8a4b12',on:1},mt:{title:'Maintenance charges',desc:'Machine repairs and spares, with a spend report.',color:'#6b3fa0',on:1}};
+var COLORS=['#1f5a3f','#8a4b12','#1d5fa8','#6b3fa0','#a8321d','#0f766e'];
+var db=load()||seed(),me=null,mod=null,tab='',cart=[],sel={},signup=false,edit=false,invMode=false,invPre='',form={addr:'',cn:'',pay:'Pay on delivery'},rep=null,ag=1,ef=null,mf=null,pf=null,mr=null,pt='exp';
+if(!db.users)db.users=[];if(!db.invites)db.invites=[];if(!db.spent)db.spent=[];
+if(!db.demoUsers){USERS.forEach(function(x){if(!db.users.some(function(y){return y.u===x.u}))db.users.push({u:x.u,p:x.p,role:x.role,name:x.name,email:x.u+'@amiraastar.demo',status:'active'})});db.demoUsers=1;save()}
+var hm=(location.hash||'').match(/invite=([A-Za-z0-9_-]+)/);if(hm){invMode=true;invPre=hm[1]}
+if(!db.cards)db.cards=JSON.parse(JSON.stringify(CARDS0));
+function fixDb(){var N={agencies:[{id:1,name:'Sri Karthikeya Rice Industries',brand:'JPC',on:1}],exp:[],nx:1,maint:[],machines:['Rice mill','Polisher','Sortex machine','Conveyor','Packing machine','Generator','Other'],settings:{vendor:'Regular cover vendor',rate:500}};
+  for(var k in N)if(db[k]===undefined)db[k]=N[k];db.rice.forEach(function(r){if(!r.agency)r.agency=1});db.maint.forEach(function(x){if(!x.agency)x.agency=1});if(!db.cards.mt)db.cards.mt=JSON.parse(JSON.stringify(CARDS0.mt));save()}
+fixDb();
+function staff(){return me.role!=='customer'}
+function load(){try{return JSON.parse(localStorage.getItem(K))}catch(e){return null}}
+function save(){try{localStorage.setItem(K,JSON.stringify(db));return true}catch(e){if(e&&e.name==='QuotaExceededError')toast('Browser storage is full. Remove old receipts or reset demo data.',4000);return false}}
+function $(s){return document.querySelector(s)}
+function inr(n){return '₹'+Number(n).toLocaleString('en-IN')}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function toast(m,ms){var t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove()},ms||2200)}
+function find(a,id){return db[a].filter(function(x){return x.id===id})[0]}
+function ref(c){if(c.m==='rice'){var r=find('rice',c.id);return{name:r.name,label:c.w+' kg',v:r.v[c.w]}}var h=find('hw',c.id);return{name:h.name,label:h.unit,v:h}}
+function tabsFor(){var r=me.role,a=mod==='rice',s=a?'Shop':'Catalog';
+  if(mod==='mt')return r==='admin'?['Repairs','Summary']:['Repairs'];
+  if(r==='customer')return [s,'My orders'];
+  if(r==='employee')return a?['Orders',s,'Stock','My expenses']:['Orders',s,'Inventory'];
+  return a?['Orders',s,'Stock & prices','Agencies','Payments','Summary','Users']:['Orders',s,'Inventory','Summary','Users']}
+function login(){var u=db.users.filter(function(x){return x.u===$('#u').value.trim().toLowerCase()&&x.p===$('#p').value})[0];
+  if(!u){$('#err').textContent='Username or password is incorrect.';return}
+  if(u.status==='pending'){$('#err').textContent='Your employee account is waiting for admin approval.';return}me=u;mod=null;cart=[];render()}
+function fill(u){var x=USERS.filter(function(a){return a.u===u})[0];$('#u').value=x.u;$('#p').value=x.p}
+function setSignup(v){signup=v;render()}
+function validEmail(x){return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x)}
+function validUser(u){return /^[a-z0-9_.]{3,20}$/.test(u)}
+function createAccount(){var n=$('#sn').value.trim(),em=$('#se').value.trim().toLowerCase(),ph=$('#sp').value.trim(),u=$('#su').value.trim().toLowerCase(),p=$('#sw').value,r=$('#sr').value,e=$('#err');
+  if(!n||!em||!u||!p){e.textContent='Fill in your name, email, username and password.';return}
+  if(!validEmail(em)){e.textContent='Enter a valid email address.';return}
+  if(!validUser(u)){e.textContent='Username: 3 to 20 letters, numbers, dot or underscore.';return}
+  if(p.length<6){e.textContent='Password must be at least 6 characters.';return}
+  if(db.users.some(function(x){return x.u===u})){e.textContent='That username is taken. Try another.';return}
+  if(db.users.some(function(x){return x.email===em})){e.textContent='An account with this email already exists.';return}
+  var emp=r==='employee',a={u:u,p:p,role:emp?'employee':'customer',name:n,email:em,phone:ph,status:emp?'pending':'active'};db.users.push(a);save();signup=false;
+  if(emp){render();toast('Request sent. An admin must approve your employee account before you can sign in.',4500);return}
+  me=a;mod=null;cart=[];toast('Account created');render()}
+function setInv(v){invMode=v;if(!v)invPre='';render()}
+function b64e(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function b64d(t){t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';return JSON.parse(decodeURIComponent(escape(atob(t))))}
+function readInvite(x){var iv=db.invites.filter(function(i){return i.code===x.toUpperCase()})[0];
+  if(!iv){try{var d=b64d(x);iv={code:d.c,email:String(d.e||'').toLowerCase(),name:d.n||'',role:d.r}}catch(e){return null}}
+  if(!iv.code||db.spent.indexOf(iv.code)>-1||!validEmail(iv.email)||['customer','employee','admin'].indexOf(iv.role)<0)return null;
+  if(db.users.some(function(u){return u.email===iv.email}))return null;return iv}
+function suggestUser(em){var b=em.split('@')[0].toLowerCase().replace(/[^a-z0-9_.]/g,'').slice(0,16);if(b.length<3)b=(b+'user').slice(0,8);var u=b;while(db.users.some(function(x){return x.u===u}))u=b+Math.floor(Math.random()*900+100);return u}
+function acceptInvite(){var n=$('#in').value.trim(),u=$('#iu').value.trim().toLowerCase(),p=$('#ip').value,e=$('#err'),iv=readInvite($('#ic').value.trim());
+  if(!iv){e.textContent='That invite is not valid or has already been used. Ask your admin for a new invite.';return}
+  if(!n||!validUser(u)||p.length<6){e.textContent='Enter your name, a username (3 to 20 letters or numbers) and a password of 6 or more characters.';return}
+  if(db.users.some(function(x){return x.u===u})){e.textContent='That username is taken. Try another.';return}
+  var a={u:u,p:p,role:iv.role,name:n,email:iv.email,status:'active'};db.users.push(a);db.spent.push(iv.code);db.invites=db.invites.filter(function(x){return x.code!==iv.code});save();
+  me=a;mod=null;cart=[];invMode=false;invPre='';try{history.replaceState(null,'',location.pathname+location.search)}catch(x){}toast('Welcome, '+n.split(' ')[0]);render()}
+function logout(){me=null;mod=null;render()}
+function open_(m){mod=m;tab=tabsFor()[0];rep=null;mr=null;pf=null;render()}
+function home(){mod=null;render()}
+function go(x){tab=x;if(x==='Summary'){rep=null;mr=null}if(x==='Payments')pf=null;render()}
+function render(){var a=$('#app');
+  if(!me&&invMode){var iv=invPre?readInvite(invPre):null,bk='<p style="margin:14px 0 0"><button class="btn alt" onclick="setInv(false)">Back to sign in</button></p>';
+    if(invPre&&!iv){a.innerHTML='<div class="wrap login"><h1>Invite not valid</h1><div class="card"><p class="mut" style="margin:0">This invite link is invalid, was cancelled, or has already been used. Ask your admin to send a new invite.</p>'+bk+'</div></div>';return}
+    if(iv){a.innerHTML='<div class="wrap login"><h1>You are invited</h1><p class="mut">Join AmiraASTAR as '+(iv.role==='admin'?'an admin':'a '+iv.role)+'. Choose a password to finish.</p><div class="card"><div class="mut">Email</div><div style="margin-bottom:12px"><b>'+esc(iv.email)+'</b></div><input type="hidden" id="ic" value="'+esc(invPre)+'"><label>Full name<input type="text" id="in" value="'+esc(iv.name)+'"></label><label>Username<input type="text" id="iu" value="'+esc(suggestUser(iv.email))+'"></label><label>Password<input type="password" id="ip" autocomplete="new-password"></label><p class="err" id="err"></p><button class="btn" style="width:100%" onclick="acceptInvite()">Join AmiraASTAR</button>'+bk+'</div></div>';return}
+    a.innerHTML='<div class="wrap login"><h1>Accept your invite</h1><p class="mut">Enter the invite code from your email and set up your sign-in.</p><div class="card"><label>Invite code<input type="text" id="ic"></label><label>Full name<input type="text" id="in"></label><label>Username<input type="text" id="iu" autocomplete="username"></label><label>Password<input type="password" id="ip" autocomplete="new-password"></label><p class="err" id="err"></p><button class="btn" style="width:100%" onclick="acceptInvite()">Join</button>'+bk+'</div></div>';return}
+  if(!me&&signup){a.innerHTML='<div class="wrap login"><h1>Create your account</h1><p class="mut">Customers can order right away. Employee accounts are activated once an admin approves them.</p><div class="card"><label>Full name<input type="text" id="sn" autocomplete="name"></label><label>Email<input type="text" id="se" autocomplete="email"></label><label>Phone<input type="text" id="sp" autocomplete="tel"></label><label>I am signing up as<select id="sr" style="width:100%;padding:10px;margin:4px 0 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg)"><option value="customer">Customer (place orders)</option><option value="employee">Employee (needs admin approval)</option></select></label><label>Username<input type="text" id="su" autocomplete="username"></label><label>Password<input type="password" id="sw" autocomplete="new-password"></label><p class="err" id="err"></p><button class="btn" style="width:100%" onclick="createAccount()">Create account</button><p style="margin:14px 0 0"><button class="btn alt" onclick="setSignup(false)">Back to sign in</button></p></div></div>';return}
+  if(!me){a.innerHTML='<div class="wrap login"><h1>AmiraASTAR</h1><p class="mut">Sign in to open your marketplaces and inventory.</p><div class="card"><label>Username<input type="text" id="u" autocomplete="username"></label><label>Password<input type="password" id="p" autocomplete="current-password"></label><p class="err" id="err"></p><button class="btn" style="width:100%" onclick="login()">Sign in</button><p class="mut" style="margin:14px 0 0">Demo accounts (tap to fill):</p><div class="demo"><button class="btn alt" onclick="fill(\'admin\')">Admin</button><button class="btn alt" onclick="fill(\'employee\')">Employee</button><button class="btn alt" onclick="fill(\'customer\')">Customer</button></div><p class="mut" style="margin:16px 0 6px">New here?</p><button class="btn alt" onclick="setSignup(true)">Create account</button> <button class="btn alt" onclick="setInv(true)">I have an invite</button></div></div>';
+    $('#p').addEventListener('keydown',function(e){if(e.key==='Enter')login()});return}
+  var h='<header><b>AmiraASTAR</b><span>'+esc(me.name)+'</span>'+(mod?'<button class="btn" onclick="home()">All apps</button>':'')+'<button class="btn" onclick="logout()">Sign out</button></header><div class="wrap">';
+  if(!mod){h+=homeHtml()}
+  else{h+='<nav>';tabsFor().forEach(function(x){h+='<button class="'+(x===tab?'on':'')+'" onclick="go(\''+x+'\')">'+x+'</button>'});h+='</nav>'+view()}
+  a.innerHTML=h+'</div>'}
+function homeHtml(){var h='<div class="row" style="margin-bottom:12px;flex-wrap:wrap"><h2 style="margin:0">Welcome, '+esc(me.name.split(' ')[0])+'</h2>'+(staff()?'<button class="btn alt" onclick="toggleEdit()">'+(edit?'Done customizing':'Customize cards')+'</button>':'')+'</div><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">';
+  ['rice','hw'].forEach(function(k){var c=db.cards[k];if(!c||(k==='mt'&&!staff())||(!c.on&&!staff()))return;
+    h+='<div class="card mod'+(c.on?'':' dim')+'" style="--c:'+c.color+'">';
+    if(edit&&staff()){h+='<label class="mut">Card title<input type="text" value="'+esc(c.title)+'" onchange="setCard(\''+k+'\',\'title\',this.value)"></label><label class="mut">Description<textarea rows="3" onchange="setCard(\''+k+'\',\'desc\',this.value)">'+esc(c.desc)+'</textarea></label><div class="mut">Colour</div><div class="row" style="justify-content:flex-start;margin:6px 0 12px">';
+      COLORS.forEach(function(x){h+='<button class="sw'+(x===c.color?' on':'')+'" style="background:'+x+'" aria-label="Colour '+x+'" onclick="setCard(\''+k+'\',\'color\',\''+x+'\')"></button>'});
+      h+='</div><button class="btn alt" onclick="setCard(\''+k+'\',\'on\','+(c.on?0:1)+')">'+(c.on?'Hide from customers':'Show to customers')+'</button>'}
+    else h+='<h3>'+esc(c.title)+'</h3><div class="mut">'+esc(c.desc)+'</div>'+(c.on?'':'<div class="badge low" style="margin-top:8px">Hidden from customers</div>')+'<div><button class="btn" onclick="open_(\''+k+'\')">Open '+esc(c.title)+'</button></div>';
+    h+='</div>'});
+  return h+'</div>'}
+function toggleEdit(){edit=!edit;render()}
+function setCard(k,f,v){if(f==='title'&&!String(v).trim())v=CARDS0[k].title;db.cards[k][f]=v;save();if(f==='title'||f==='desc')toast('Saved');else render()}
+function view(){
+  if(tab==='Shop')return shop();if(tab==='Catalog')return hwShop();
+  if(tab==='My orders')return orders(true);if(tab==='Orders')return orders(false);
+  if(tab==='Stock'||tab==='Stock & prices')return inv();if(tab==='Inventory')return hwInv();if(tab==='Users')return users();if(tab==='My expenses')return myExp();if(tab==='Payments')return payments();if(tab==='Agencies')return agenciesTab();if(tab==='Repairs')return repairs();return mod==='mt'?mtReport():summary()}
+/* ---- cart & orders ---- */
+function pick(id,w){sel[id]=w;render()}
+function addCart(id){if(mod==='rice'){var ra=find('rice',id).agency,ot=cart.filter(function(x){return x.m==='rice'&&find('rice',x.id).agency!==ra})[0];if(ot){toast('Your cart has rice from '+agName(find('rice',ot.id).agency)+'. Place that order first.',3500);return}}var w=mod==='rice'?sel[id]:0,c=cart.filter(function(x){return x.m===mod&&x.id===id&&x.w===w})[0],v=ref({m:mod,id:id,w:w}).v;
+  if((c?c.q:0)+1>v.s){toast('Only '+v.s+' in stock');return}
+  if(c)c.q++;else cart.push({m:mod,id:id,w:w,q:1});render()}
+function chg(i,d){var c=cart[i];if(c.q+d>ref(c).v.s){toast('No more stock for this item');return}c.q+=d;if(c.q<1)cart.splice(i,1);render()}
+function cartHtml(){var t=0,n=0,q=0,h='';
+  cart.forEach(function(c,i){if(c.m!==mod)return;n++;q+=c.q;var r=ref(c);t+=r.v.p*c.q;
+    h+='<div class="li"><div><div class="nm">'+esc(r.name)+'</div><div class="mut">'+esc(r.label)+' · '+inr(r.v.p)+' each</div></div><div class="pr">'+inr(r.v.p*c.q)+'</div><div class="qty"><button onclick="chg('+i+',-1)" aria-label="Fewer">−</button><span>'+c.q+'</span><button onclick="chg('+i+',1)" aria-label="More">+</button></div><div style="text-align:right"><button class="btn alt" style="padding:4px 10px;font-size:13px" onclick="chg('+i+',-'+c.q+')">Remove</button></div></div>'});
+  if(!n)return '<div class="cartp"><h3>Your cart</h3><p class="mut" style="margin:0">Nothing here yet. Add '+(mod==='rice'?'a bag of rice':'an item')+' to start an order.</p></div>';
+  return '<div class="cartp"><h3>Your cart ('+q+')</h3><div>'+h+'</div>'+(staff()?'<label>Customer name or phone<input type="text" value="'+esc(form.cn)+'" oninput="form.cn=this.value" placeholder="Who is this order for?"></label>':'')+'<label>Delivery address<textarea rows="3" oninput="form.addr=this.value" placeholder="House no, street, area, Bengaluru">'+esc(form.addr)+'</textarea></label><label>Payment<select onchange="form.pay=this.value">'+['Pay on delivery','UPI (demo)'].map(function(o){return '<option'+(o===form.pay?' selected':'')+'>'+o+'</option>'}).join('')+'</select></label><div class="tot"><span>Total</span><span>'+inr(t)+'</span></div><button class="btn" style="width:100%;padding:12px" onclick="place()">Place order</button></div>'}
+function cartBar(){var q=0,t=0;cart.forEach(function(c){if(c.m===mod){q+=c.q;t+=ref(c).v.p*c.q}});
+  return q?'<button class="cartbar" onclick="document.getElementById(\'cart\').scrollIntoView({behavior:\'smooth\'})"><span>View cart ('+q+')</span><span>'+inr(t)+'</span></button>':''}
+function shopWrap(list){return '<div class="shop"><div>'+list+'</div><aside class="side" id="cart">'+cartHtml()+'</aside></div>'+cartBar()}
+function place(){var ad=form.addr.trim();if(!ad){toast('Enter a delivery address');return}
+  var cn=staff()?form.cn.trim():'';if(staff()&&!cn){toast('Enter the customer name or phone');return}
+  var pay=form.pay,items=[],tot=0;
+  for(var i=0;i<cart.length;i++){var c=cart[i];if(c.m!==mod)continue;var r=ref(c);if(c.q>r.v.s){toast(r.name+' is low on stock');return}
+    items.push({m:c.m,id:c.id,w:c.w,name:r.name,label:r.label,q:c.q,price:r.v.p});tot+=r.v.p*c.q}
+  items.forEach(function(it){ref(it).v.s-=it.q});cart=cart.filter(function(c){return c.m!==mod});
+  var agid=mod==='rice'&&items.length?find('rice',items[0].id).agency:0,A=agid?find('agencies',agid):null,now=new Date();db.orders.unshift({id:db.next++,mod:mod,ag:agid,agName:A?A.name:'',brand:A?A.brand:'',lab:mod==='rice'?{heads:0,rate:db.settings.rate,paid:''}:null,cust:me.u,custName:staff()?cn:me.name,by:staff()?me.name:'',items:items,total:tot,status:'placed',addr:ad,pay:pay,paid:pay.indexOf('UPI')===0,ts:now.getTime(),date:now.toLocaleString('en-IN')});
+  form.addr='';form.cn='';save();tab=staff()?'Orders':'My orders';toast('Order placed');render()}
+var FLOW=['placed','confirmed','packed','delivered','cancelled'];
+function setStatus(id,s){var o=db.orders.filter(function(x){return x.id===id})[0];
+  if(s==='cancelled'&&o.status!=='cancelled')o.items.forEach(function(it){ref(it).v.s+=it.q});o.status=s;save();render()}
+function orders(mine){var l=db.orders.filter(function(o){return o.mod===mod&&(!mine||o.cust===me.u)});
+  if(!l.length)return '<div class="card"><b>No orders yet</b><p class="mut" style="margin:4px 0 0">'+(mine?'Add something from the '+(mod==='rice'?'Shop':'Catalog')+' tab to place your first order.':'New customer orders will show up here.')+'</p></div>';
+  var h='<h2>'+(mine?'My orders':'Customer orders')+'</h2><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">';
+  l.forEach(function(o){h+='<div class="card"><div class="row"><b>#'+o.id+'</b><span class="badge '+o.status+'">'+o.status+'</span></div><div class="mut">'+o.date+(mine?'':' · '+esc(o.custName)+(o.by?' · placed by '+esc(o.by):''))+'</div><div style="margin:8px 0">';
+    o.items.forEach(function(i){h+='<div class="row"><span>'+esc(i.name)+' ('+esc(i.label)+') × '+i.q+'</span><span>'+inr(i.price*i.q)+'</span></div>'});
+    h+='</div><div class="row"><b>Total '+inr(o.total)+'</b><span class="mut">'+esc(o.pay)+(o.paid?' · paid':'')+'</span></div><div class="mut" style="margin-top:6px">'+esc(o.addr)+'</div>';
+    if(o.mod==='rice'&&o.agName)h+='<div class="mut" style="margin-top:6px">Agency: '+esc(o.agName)+(o.brand?' ('+esc(o.brand)+' brand)':'')+'</div>';if(!mine&&o.mod==='rice')h+=opsHtml(o);if(!mine&&o.status!=='delivered'&&o.status!=='cancelled')h+='<div class="row" style="margin-top:10px"><select style="width:auto" id="s'+o.id+'">'+FLOW.map(function(f){return '<option'+(f===o.status?' selected':'')+'>'+f+'</option>'}).join('')+'</select><button class="btn" onclick="setStatus('+o.id+',$(\'#s'+o.id+'\').value)">Update status</button></div>';
+    if(mine&&o.status==='placed')h+='<button class="btn alt" style="margin-top:10px" onclick="setStatus('+o.id+',\'cancelled\')">Cancel order</button>';
+    h+='</div>'});return h+'</div>'}
+/* ---- rice ---- */
+function shop(){var h='<h2>Choose your rice</h2>'+agBar()+'<div class="grid">';
+  db.rice.filter(function(r){return r.on&&r.agency===ag}).forEach(function(r){var w=sel[r.id];if(!w||r.v[w].s<1){w=W.filter(function(x){return r.v[x].s>0})[0]||10;sel[r.id]=w}var v=r.v[w];
+    h+='<div class="card"><h3>'+esc(r.name)+'</h3><div class="mut">'+esc(r.note)+'</div><div class="chips">';
+    W.forEach(function(x){h+='<button class="chip '+(x===w?'on':'')+'" '+(r.v[x].s<1?'disabled':'')+' onclick="pick('+r.id+','+x+')">'+x+' kg</button>'});
+    h+='</div><div class="row"><div><div class="price">'+inr(v.p)+'</div><div class="mut">'+inr(Math.round(v.p/w))+' per kg</div></div><button class="btn" '+(v.s<1?'disabled':'')+' onclick="addCart('+r.id+')">Add to cart</button></div>'+(v.s>0&&v.s<=10?'<div class="mut" style="margin-top:8px;color:var(--bad)">Only '+v.s+' left</div>':'')+'</div>'});
+  return shopWrap(h+'</div>')}
+function setV(id,w,f,val){val=Math.max(0,parseInt(val,10)||0);find('rice',id).v[w][f]=val;save();toast('Saved')}
+function setN(a,id,f,v){v=v.trim();if(!v)return;find(a,id)[f]=v;save();toast('Saved')}
+function tog(a,id){var r=find(a,id);r.on=r.on?0:1;save();render()}
+function addRice(){var n=$('#nn').value.trim();if(!n){toast('Enter a rice name');return}
+  db.rice.push({id:Date.now(),agency:ag,name:n,note:$('#nd').value.trim()||'New variety',on:1,v:{10:{p:0,s:0},20:{p:0,s:0},25:{p:0,s:0}}});save();toast('Rice added. Set its prices below.');render()}
+function inv(){var adm=me.role==='admin',h='<h2>'+(adm?'Stock and prices':'Stock')+'</h2>'+(adm?'':'<p class="mut">Employees can update stock. Only an admin can change prices.</p>')+agBar()+'<div class="card tw"><table><tr><th>Rice</th>';
+  W.forEach(function(w){h+='<th>'+w+' kg price (₹)</th><th>'+w+' kg stock</th>'});h+=(adm?'<th>Listed</th>':'')+'</tr>';
+  db.rice.filter(function(r){return r.agency===ag}).forEach(function(r){h+='<tr><td><input type="text" style="width:160px;margin:0" value="'+esc(r.name)+'" onchange="setN(\'rice\','+r.id+',\'name\',this.value)" aria-label="Rice name"><input type="text" style="width:160px;margin:4px 0 0" value="'+esc(r.note)+'" onchange="setN(\'rice\','+r.id+',\'note\',this.value)" aria-label="Rice description"></td>';
+    W.forEach(function(w){h+='<td><input type="number" min="0" value="'+r.v[w].p+'" '+(adm?'':'disabled')+' onchange="setV('+r.id+','+w+',\'p\',this.value)" aria-label="'+esc(r.name)+' '+w+' kg price"></td><td><input type="number" min="0" value="'+r.v[w].s+'" onchange="setV('+r.id+','+w+',\'s\',this.value)" aria-label="'+esc(r.name)+' '+w+' kg stock"></td>'});
+    h+=(adm?'<td><button class="btn alt" onclick="tog(\'rice\','+r.id+')">'+(r.on?'Hide':'Show')+'</button></td>':'')+'</tr>'});
+  h+='</table></div>';
+  if(adm)h+='<div class="card" style="margin-top:14px"><b>Add a rice type to '+esc(agName(ag))+'</b><div class="row" style="margin-top:8px;flex-wrap:wrap"><input type="text" id="nn" placeholder="Rice name" style="flex:1;margin:0"><input type="text" id="nd" placeholder="Short description" style="flex:2;margin:0"><button class="btn" onclick="addRice()">Add rice</button></div></div>';return h}
+/* ---- hardware ---- */
+function hwShop(){var h='<h2>Hardware catalog</h2><p class="mut">Indicative market prices. Final rates are confirmed at order.</p>';
+  CATS.forEach(function(c){var l=db.hw.filter(function(x){return x.cat===c&&x.on});if(!l.length)return;h+='<h4>'+c+'</h4><div class="grid">';
+    l.forEach(function(x){h+='<div class="card"><h3>'+esc(x.name)+'</h3><div class="mut">per '+esc(x.unit)+'</div><div class="row" style="margin-top:10px"><div><div class="price">'+inr(x.p)+'</div>'+(x.s>0&&x.s<=x.min?'<div class="mut" style="color:var(--bad)">Only '+x.s+' left</div>':'')+(x.s<1?'<div class="mut" style="color:var(--bad)">Out of stock</div>':'')+'</div><button class="btn" '+(x.s<1?'disabled':'')+' onclick="addCart('+x.id+')">Add</button></div></div>'});h+='</div>'});
+  return shopWrap(h)}
+function setH(id,f,val){find('hw',id)[f]=Math.max(0,parseInt(val,10)||0);save();toast('Saved');render()}
+function addHw(){var n=$('#hn').value.trim();if(!n){toast('Enter an item name');return}
+  db.hw.push(H(Date.now(),n,$('#hc').value,$('#hu').value.trim()||'piece',parseInt($('#hp').value,10)||0,parseInt($('#hs').value,10)||0,10));save();toast('Item added');render()}
+function hwInv(){var adm=me.role==='admin',h='<h2>Hardware inventory</h2>'+(adm?'':'<p class="mut">Employees can update stock. Only an admin can change prices.</p>')+'<div class="card tw"><table><tr><th>Item</th><th>Category</th><th>Unit</th><th>Price (₹)</th><th>Stock</th><th>Reorder at</th><th>Status</th>'+(adm?'<th>Listed</th>':'')+'</tr>';
+  db.hw.forEach(function(x){h+='<tr><td><input type="text" style="width:180px;margin:0" value="'+esc(x.name)+'" onchange="setN(\'hw\','+x.id+',\'name\',this.value)" aria-label="Item name"></td><td>'+x.cat+'</td><td>'+esc(x.unit)+'</td><td><input type="number" min="0" value="'+x.p+'" '+(adm?'':'disabled')+' onchange="setH('+x.id+',\'p\',this.value)" aria-label="'+esc(x.name)+' price"></td><td><input type="number" min="0" value="'+x.s+'" onchange="setH('+x.id+',\'s\',this.value)" aria-label="'+esc(x.name)+' stock"></td><td><input type="number" min="0" value="'+x.min+'" '+(adm?'':'disabled')+' onchange="setH('+x.id+',\'min\',this.value)" aria-label="'+esc(x.name)+' reorder level"></td><td>'+(x.s<=x.min?'<span class="badge low">Reorder</span>':'<span class="badge delivered">OK</span>')+'</td>'+(adm?'<td><button class="btn alt" onclick="tog(\'hw\','+x.id+')">'+(x.on?'Hide':'Show')+'</button></td>':'')+'</tr>'});
+  h+='</table></div>';
+  if(adm)h+='<div class="card" style="margin-top:14px"><b>Add an item</b><div class="row" style="margin-top:8px;flex-wrap:wrap"><input type="text" id="hn" placeholder="Item name" style="flex:2;margin:0"><select id="hc" style="width:auto">'+CATS.map(function(c){return '<option>'+c+'</option>'}).join('')+'</select><input type="text" id="hu" placeholder="Unit (kg, bag, rod)" style="flex:1;margin:0"><input type="text" id="hp" placeholder="Price ₹" style="flex:1;margin:0"><input type="text" id="hs" placeholder="Stock" style="flex:1;margin:0"><button class="btn" onclick="addHw()">Add item</button></div></div>';return h}
+/* ---- users ---- */
+function inviteLink(iv){return location.href.split('#')[0]+'#invite='+b64e({c:iv.code,e:iv.email,n:iv.name||'',r:iv.role})}
+function mailto(iv){var b='Hi '+(iv.name||'there')+',\n\nYou have been invited to join AmiraASTAR as '+(iv.role==='admin'?'an admin':'a '+iv.role)+'.\n\nOpen this link to set up your account:\n'+inviteLink(iv)+'\n\nInvite code: '+iv.code+'\n\nThanks';
+  return 'mailto:'+encodeURIComponent(iv.email)+'?subject='+encodeURIComponent('You are invited to AmiraASTAR')+'&body='+encodeURIComponent(b)}
+function copyLink(code){var m=function(){toast('Copy blocked. Share code '+code+' instead.',4000)};try{navigator.clipboard.writeText(inviteLink(db.invites.filter(function(i){return i.code===code})[0])).then(function(){toast('Invite link copied')},m)}catch(e){m()}}
+function users(){var h='<h2>Users</h2>',pend=db.users.filter(function(x){return x.status==='pending'});
+  if(pend.length){h+='<div class="card" style="border-color:var(--acc);margin-bottom:14px"><b>Waiting for approval</b><table>';
+    pend.forEach(function(x){h+='<tr><td>'+esc(x.name)+'<div class="mut">'+esc(x.email||'')+'</div></td><td><span class="badge">'+x.role+'</span></td><td style="text-align:right"><button class="btn" onclick="approve(\''+esc(x.u)+'\',1)">Approve</button> <button class="btn alt" onclick="approve(\''+esc(x.u)+'\',0)">Decline</button></td></tr>'});h+='</table></div>'}
+  h+='<div class="card tw"><table><tr><th>Name</th><th>Email</th><th>Username</th><th>User type</th><th></th></tr>';
+  db.users.filter(function(x){return x.status!=='pending'}).forEach(function(x){var self=x.u===me.u;
+    h+='<tr><td>'+esc(x.name)+'</td><td>'+esc(x.email||'-')+'</td><td>'+esc(x.u)+'</td><td><select style="width:auto" '+(self?'disabled title="You cannot change your own user type"':'')+' onchange="setRole(\''+esc(x.u)+'\',this.value)" aria-label="User type for '+esc(x.name)+'">'+['customer','employee','admin'].map(function(r){return '<option'+(r===x.role?' selected':'')+'>'+r+'</option>'}).join('')+'</select></td><td>'+(self?'<span class="mut">You</span>':'<button class="btn alt" onclick="delUser(\''+esc(x.u)+'\')">Remove</button>')+'</td></tr>'});
+  h+='</table></div><div class="card" style="margin-top:14px"><b>Onboard a user</b><p class="mut" style="margin:4px 0 10px">Send an invite so they set their own password, or create the account now. Admins can onboard other admins the same way.</p><div class="row" style="flex-wrap:wrap;justify-content:flex-start"><input type="text" id="an" placeholder="Full name" style="flex:1;min-width:150px;margin:0"><input type="text" id="ae" placeholder="Email" style="flex:1;min-width:180px;margin:0"><select id="ar" style="width:auto" aria-label="User type"><option>customer</option><option>employee</option><option>admin</option></select></div><div class="row" style="margin-top:10px;flex-wrap:wrap;justify-content:flex-start"><button class="btn" onclick="sendInvite()">Send invite</button><span class="mut">or create now:</span><input type="text" id="au" placeholder="Username" style="flex:1;min-width:120px;margin:0"><input type="password" id="ap" placeholder="Password (6+ characters)" style="flex:1;min-width:150px;margin:0"><button class="btn alt" onclick="addUser()">Create account</button></div><p class="err" id="err" style="margin:8px 0 0"></p></div>';
+  if(db.invites.length){h+='<div class="card" style="margin-top:14px"><b>Pending invites</b><table>';
+    db.invites.forEach(function(iv){h+='<tr><td>'+esc(iv.name||iv.email)+'<div class="mut">'+esc(iv.email)+' · '+iv.date+'</div></td><td><span class="badge">'+iv.role+'</span></td><td>'+iv.code+'</td><td style="text-align:right"><a class="btn" style="display:inline-block;text-decoration:none" href="'+esc(mailto(iv))+'" target="_blank" rel="noopener">Email invite</a> <button class="btn alt" onclick="copyLink(\''+iv.code+'\')">Copy link</button> <button class="btn alt" onclick="revoke(\''+iv.code+'\')">Revoke</button></td></tr>'});h+='</table></div>'}
+  return h}
+function sendInvite(){var n=$('#an').value.trim(),em=$('#ae').value.trim().toLowerCase(),e=$('#err');
+  if(!validEmail(em)){e.textContent='Enter the email address to invite.';return}
+  if(db.users.some(function(x){return x.email===em})){e.textContent='An account with this email already exists.';return}
+  db.invites=db.invites.filter(function(x){return x.email!==em});
+  db.invites.unshift({code:Math.random().toString(36).slice(2,10).toUpperCase(),email:em,name:n,role:$('#ar').value,date:new Date().toLocaleDateString('en-IN')});save();toast('Invite created. Choose Email invite to send it.',3500);render()}
+function addUser(){var n=$('#an').value.trim(),em=$('#ae').value.trim().toLowerCase(),u=$('#au').value.trim().toLowerCase(),p=$('#ap').value,e=$('#err');
+  if(!n||!validUser(u)||p.length<6){e.textContent='To create now, enter a name, a username (3 to 20 letters or numbers) and a password of 6 or more characters.';return}
+  if(em&&!validEmail(em)){e.textContent='Enter a valid email address or leave it empty.';return}
+  if(db.users.some(function(x){return x.u===u})){e.textContent='That username is taken.';return}
+  db.users.push({u:u,p:p,role:$('#ar').value,name:n,email:em,status:'active'});save();toast('Account created');render()}
+function setRole(u,r){var x=db.users.filter(function(y){return y.u===u})[0];if(!x||x.u===me.u)return;x.role=r;save();toast(x.name+' is now '+r)}
+function approve(u,ok){if(ok){db.users.filter(function(x){return x.u===u})[0].status='active';toast('Employee approved')}else db.users=db.users.filter(function(x){return x.u!==u});save();render()}
+function delUser(u){if(u===me.u)return;db.users=db.users.filter(function(x){return x.u!==u});save();render()}
+function revoke(c){db.spent.push(c);db.invites=db.invites.filter(function(x){return x.code!==c});save();render()}
+/* ---- summary ---- */
+function dstr(d){var m=d.getMonth()+1,x=d.getDate();return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(x<10?'0':'')+x}
+function otime(o){if(o.ts)return o.ts;var m=String(o.date||'').match(/^(\d+)\/(\d+)\/(\d+)/);return m?new Date(+m[3],+m[2]-1,+m[1]).getTime():0}
+function setRep(f,v){if(!v&&(f==='from'||f==='to'))v=dstr(new Date());rep[f]=v;render()}
+function todayRep(){var t=dstr(new Date());rep.from=t;rep.to=t;render()}
+function summary(){var td=dstr(new Date());if(!rep)rep={from:td,to:td,status:'all',app:mod,ag:'all'};
+  var lo=rep.from<=rep.to?rep.from:rep.to,hi=rep.from<=rep.to?rep.to:rep.from,f=new Date(lo+'T00:00:00').getTime(),e=new Date(hi+'T23:59:59').getTime(),
+    base=db.orders.filter(function(o){var t=otime(o);return(rep.app==='all'||o.mod===rep.app)&&(!rep.ag||rep.ag==='all'||o.ag===+rep.ag)&&t>=f&&t<=e}),
+    list=base.filter(function(o){return rep.status==='all'||o.status===rep.status}).sort(function(a,b){return otime(b)-otime(a)}),
+    live=list.filter(function(o){return o.status!=='cancelled'}),rev=live.reduce(function(a,o){return a+o.total},0),
+    qty=live.reduce(function(a,o){return a+o.items.reduce(function(b,i){return b+i.q},0)},0),cnt={all:base.length},lab=list.reduce(function(a,o){return a+(o.lab?(o.lab.heads||0)*(o.lab.rate||0):0)},0);
+  FLOW.forEach(function(x){cnt[x]=base.filter(function(o){return o.status===x}).length});
+  var h='<h2>Orders report</h2><div class="filters"><label>From<input type="date" value="'+rep.from+'" onchange="setRep(\'from\',this.value)"></label><label>To<input type="date" value="'+rep.to+'" onchange="setRep(\'to\',this.value)"></label><label>App<select onchange="setRep(\'app\',this.value)">'+[['all','All apps'],['rice','RiceMarket'],['hw','Hardware']].map(function(o){return '<option value="'+o[0]+'"'+(o[0]===rep.app?' selected':'')+'>'+o[1]+'</option>'}).join('')+'</select></label><label>Agency<select onchange="setRep(\'ag\',this.value)"><option value="all">All agencies</option>'+db.agencies.map(function(a){return '<option value="'+a.id+'"'+(String(rep.ag)===String(a.id)?' selected':'')+'>'+esc(a.name)+'</option>'}).join('')+'</select></label><button class="btn alt" onclick="todayRep()">Today</button></div><div class="chips" style="flex-wrap:wrap;margin-top:0">';
+  ['all'].concat(FLOW).forEach(function(x){h+='<button class="chip'+(rep.status===x?' on':'')+'" style="flex:0 0 auto;padding:7px 14px" aria-pressed="'+(rep.status===x)+'" onclick="setRep(\'status\',\''+x+'\')">'+(x==='all'?'All':x)+' ('+cnt[x]+')</button>'});
+  h+='</div><div class="grid" style="margin-bottom:14px"><div class="card"><div class="mut">Orders</div><div class="stat">'+list.length+'</div></div><div class="card"><div class="mut">Revenue (excl. cancelled)</div><div class="stat">'+inr(rev)+'</div></div><div class="card"><div class="mut">Items sold</div><div class="stat">'+qty+'</div></div><div class="card"><div class="mut">Average order</div><div class="stat">'+inr(live.length?Math.round(rev/live.length):0)+'</div></div><div class="card"><div class="mut">Labour cost</div><div class="stat">'+inr(lab)+'</div></div></div>';
+  if(!list.length)h+='<div class="card"><b>No orders match these filters</b><p class="mut" style="margin:4px 0 0">Widen the date range, or choose All to see every status.</p></div>';
+  else{h+='<div class="card tw"><table><tr><th>Order</th><th>Date and time</th><th>App</th><th>Customer</th><th>Items</th><th>Status</th><th>Payment</th><th style="text-align:right">Total</th></tr>';
+    list.forEach(function(o){h+='<tr><td><b>#'+o.id+'</b></td><td>'+esc(o.date)+'</td><td>'+(o.mod==='rice'?'RiceMarket'+(o.agName?' · '+esc(o.agName):''):'Hardware')+'</td><td>'+esc(o.custName)+'</td><td>'+esc(o.items.map(function(i){return i.name+' ('+i.label+') × '+i.q}).join(', '))+'</td><td><span class="badge '+o.status+'">'+o.status+'</span></td><td>'+esc(o.pay)+(o.paid?' · paid':'')+'</td><td style="text-align:right">'+inr(o.total)+'</td></tr>'});
+    h+='</table></div>'}
+  var val=0,low=[];(rep.app==='all'?['rice','hw']:[rep.app]).forEach(function(m){
+    if(m==='rice')db.rice.forEach(function(r){W.forEach(function(w){val+=r.v[w].p*r.v[w].s;if(r.v[w].s<=5)low.push(r.name+' '+w+' kg ('+r.v[w].s+' left)')})});
+    else db.hw.forEach(function(x){val+=x.p*x.s;if(x.s<=x.min)low.push(x.name+' ('+x.s+' '+x.unit+')')})});
+  return h+'<div class="grid" style="margin-top:14px"><div class="card"><div class="mut">Stock value</div><div class="stat">'+inr(val)+'</div></div><div class="card" style="grid-column:span 2"><b>Needs restocking</b><p class="mut" style="margin:6px 0 0">'+(low.length?esc(low.join(', ')):'Everything is well stocked.')+'</p></div></div><p style="margin-top:14px"><button class="btn alt" onclick="if(confirm(\'Reset all demo data for both apps?\')){var uu=db.users,ii=db.invites,ss=db.spent;db=seed();db.users=uu;db.invites=ii;db.spent=ss;db.demoUsers=1;fixDb();save();cart=[];render()}">Reset demo data</button></p>'}
+/* ---- agencies ---- */
+function agList(){return db.agencies.filter(function(a){return a.on||staff()})}
+function agName(id){var a=db.agencies.filter(function(x){return x.id===id})[0];return a?a.name:''}
+function setAgSel(id){ag=id;render()}
+function agBar(){var l=agList();if(!l.length)return '<div class="card" style="margin-bottom:12px"><b>No agencies yet</b></div>';if(!l.some(function(x){return x.id===ag}))ag=l[0].id;
+  var h='<div class="mut" style="margin-bottom:6px">Agency</div><div class="chips" style="flex-wrap:wrap;margin:0 0 12px">';
+  l.forEach(function(a){h+='<button class="chip'+(a.id===ag?' on':'')+'" style="flex:0 0 auto;padding:8px 14px" aria-pressed="'+(a.id===ag)+'" onclick="setAgSel('+a.id+')">'+esc(a.name)+(a.brand?' ('+esc(a.brand)+')':'')+(a.on?'':' · hidden')+'</button>'});
+  return h+'</div>'}
+function setAgency(id,f,v){v=v.trim();if(f==='name'&&!v)return;find('agencies',id)[f]=v;save();toast('Saved')}
+function togAgency(id){var a=find('agencies',id);a.on=a.on?0:1;save();render()}
+function addAgency(){var n=$('#an2').value.trim(),b=$('#ab2').value.trim();if(!n){toast('Enter the agency name');return}
+  if(db.agencies.some(function(x){return x.name.toLowerCase()===n.toLowerCase()})){toast('That agency already exists');return}
+  var id=Date.now();db.agencies.push({id:id,name:n,brand:b,on:1});ag=id;save();toast('Agency added. Add its rice in Stock & prices.',3500);render()}
+function setSet(k,v){db.settings[k]=k==='rate'?Math.max(0,parseInt(v,10)||0):v.trim();save();toast('Saved')}
+function agenciesTab(){var h='<h2>Agencies</h2><p class="mut">Each agency sells rice under its own brand. Customers choose an agency before they order.</p><div class="card tw"><table><tr><th>Agency name</th><th>Brand</th><th>Rice types</th><th>Listed</th></tr>';
+  db.agencies.forEach(function(a){h+='<tr><td><input type="text" style="width:250px;margin:0" value="'+esc(a.name)+'" onchange="setAgency('+a.id+',\'name\',this.value)" aria-label="Agency name"></td><td><input type="text" style="width:110px;margin:0" value="'+esc(a.brand)+'" onchange="setAgency('+a.id+',\'brand\',this.value)" aria-label="Brand"></td><td>'+db.rice.filter(function(r){return r.agency===a.id}).length+'</td><td><button class="btn alt" onclick="togAgency('+a.id+')">'+(a.on?'Hide':'Show')+'</button></td></tr>'});
+  return h+'</table></div><div class="card" style="margin-top:14px"><b>Add an agency</b><div class="row" style="margin-top:8px;flex-wrap:wrap"><input type="text" id="an2" placeholder="Agency name" style="flex:2;margin:0"><input type="text" id="ab2" placeholder="Brand (for example JPC)" style="flex:1;margin:0"><button class="btn" onclick="addAgency()">Add agency</button></div><p class="mut" style="margin:8px 0 0">After adding, open Stock &amp; prices, choose the agency and add its rice types.</p></div><div class="card" style="margin-top:14px"><b>Order defaults</b><div class="ef" style="margin-top:8px"><label>Regular cover vendor<input type="text" value="'+esc(db.settings.vendor)+'" onchange="setSet(\'vendor\',this.value)"></label><label>Labour rate (₹ per head)<input type="number" min="0" value="'+db.settings.rate+'" onchange="setSet(\'rate\',this.value)"></label></div></div>'}
+/* ---- order operations: covers and labour ---- */
+function opsHtml(o){var bags=o.items.reduce(function(a,i){return a+i.q},0),L=o.lab||{heads:0,rate:db.settings.rate,paid:''},
+  cov=db.exp.filter(function(e){return e.cat==='Covers'&&e.order===o.id&&e.status!=='rejected'}),
+  h='<div class="ops"><div><b>Brand covers</b> <span class="mut">'+(o.brand?esc(o.brand)+' brand, ':'')+bags+' bags</span></div>';
+  if(cov.length)cov.forEach(function(e){h+='<div class="row"><span>'+(e.qty||'')+' covers · '+inr(e.amount)+(e.vendor?' · '+esc(e.vendor):'')+'</span><span class="badge '+e.status+'">'+e.status+'</span></div>'});
+  else if(o.status!=='cancelled')h+='<div class="row"><span class="badge low">Covers to buy</span>'+(me.role==='employee'?'<button class="btn" onclick="buyCovers('+o.id+')">Buy covers</button>':'')+'</div>';
+  var amt=(L.heads||0)*(L.rate||0),lk=!!L.paid;
+  return h+'<div style="margin-top:8px"><b>Labour</b><div class="row" style="justify-content:flex-start;flex-wrap:wrap;gap:10px;margin-top:6px"><label class="mut">Heads<input type="number" min="0" id="lh'+o.id+'" value="'+(L.heads||0)+'"'+(lk?' disabled':'')+' oninput="labCalc('+o.id+')" onchange="setLab('+o.id+')"></label><label class="mut">₹ per head<input type="number" min="0" id="lr'+o.id+'" value="'+(L.rate||0)+'"'+(lk?' disabled':'')+' oninput="labCalc('+o.id+')" onchange="setLab('+o.id+')"></label><div><div class="mut">Amount</div><b id="la'+o.id+'">'+inr(amt)+'</b></div>'+(lk?'<span class="badge delivered">Paid '+esc(L.paid)+'</span><button class="btn alt" onclick="labPay('+o.id+',0)">Undo</button>':'<button class="btn alt" onclick="labPay('+o.id+',1)">Mark paid</button>')+'</div></div></div>'}
+function ordr(id){return db.orders.filter(function(x){return x.id===id})[0]}
+function labCalc(id){var hs=Math.max(0,parseInt($('#lh'+id).value,10)||0),r=Math.max(0,parseFloat($('#lr'+id).value)||0);$('#la'+id).textContent=inr(hs*r)}
+function readLab(o){o.lab=o.lab||{heads:0,rate:db.settings.rate,paid:''};o.lab.heads=Math.max(0,parseInt($('#lh'+o.id).value,10)||0);o.lab.rate=Math.max(0,parseFloat($('#lr'+o.id).value)||0)}
+function setLab(id){var o=ordr(id);readLab(o);save();labCalc(id);toast('Labour saved')}
+function labPay(id,on){var o=ordr(id);if(!o.lab||!o.lab.paid)readLab(o);if(on&&!o.lab.heads){toast('Enter the head count first');return}o.lab.paid=on?new Date().toLocaleDateString('en-IN'):'';save();render()}
+/* ---- employee expenses ---- */
+var ECATS=['Petrol','Food','Covers','Other'];
+function getEf(){if(!ef)ef={date:dstr(new Date()),cat:'Petrol',order:'',amount:'',vendor:'',qty:'',details:'',pod:'',emp:'',st:'approved'};return ef}
+function setEf(k,v){getEf()[k]=v}
+function bagsOf(id){var o=ordr(id);return o?o.items.reduce(function(a,i){return a+i.q},0):0}
+function efCat(v){var E=getEf();E.cat=v;if(v==='Covers'&&!E.vendor)E.vendor=db.settings.vendor;render()}
+function efOrder(v){var E=getEf();E.order=v;if(E.cat==='Covers'&&v&&!E.qty)E.qty=bagsOf(+v);render()}
+function buyCovers(id){var E=getEf();E.cat='Covers';E.order=String(id);E.qty=bagsOf(id);E.vendor=db.settings.vendor;tab='My expenses';render()}
+function tgt(t){return t==='mf'?getMf():getEf()}
+function readPod(inp,t){var f=inp.files&&inp.files[0];if(!f)return;if(!/^image\//.test(f.type)){toast('Upload a photo of the bill (JPG or PNG).',3500);return}
+  var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var sc=Math.min(1,1000/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext('2d').drawImage(im,0,0,c.width,c.height);tgt(t).pod=c.toDataURL('image/jpeg',.65);render()};im.onerror=function(){toast('Could not read that image')};im.src=r.result};r.readAsDataURL(f)}
+function clearPod(t){tgt(t).pod='';render()}
+function viewPod(kind,id){var x=(kind==='exp'?db.exp:db.maint).filter(function(y){return y.id===id})[0];if(!x||!x.pod)return;var d=document.createElement('div');d.className='modal';d.innerHTML='<div class="mbox"><img src="'+x.pod+'" alt="Bill"><button class="btn">Close</button></div>';d.onclick=function(e){if(e.target===d||e.target.tagName==='BUTTON')d.remove()};document.body.appendChild(d)}
+function podField(t,req){var P=tgt(t).pod;return '<div class="full"><label>Bill or receipt (POD)'+(req?'':' (optional)')+'<input type="file" accept="image/*" onchange="readPod(this,\''+t+'\')"></label>'+(P?'<div class="row" style="justify-content:flex-start;gap:10px;margin-top:8px"><img class="pod" src="'+P+'" alt="Attached bill"><button class="btn alt" onclick="clearPod(\''+t+'\')">Remove</button></div>':'')+'</div>'}
+function submitExp(){var E=getEf(),a=parseFloat(E.amount);
+  if(!(a>0)){toast('Enter the amount spent');return}
+  if(!E.details.trim()){toast('Add details of what this was for');return}
+  if(E.cat==='Covers'&&!(parseInt(E.qty,10)>0)){toast('Enter how many covers you bought');return}
+  if(!E.pod){toast('Upload the bill or receipt (POD)');return}
+  db.exp.unshift({id:db.nx++,date:E.date||dstr(new Date()),emp:me.u,empName:me.name,cat:E.cat,amount:Math.round(a*100)/100,vendor:E.vendor.trim(),qty:parseInt(E.qty,10)||0,details:E.details.trim(),order:E.order?+E.order:null,pod:E.pod,status:'submitted',note:'',ts:Date.now()});
+  if(!save()){db.exp.shift();return}ef=null;toast('Submitted for approval');render()}
+function expCard(x,adm){var a='';
+  if(adm&&x.status==='submitted')a='<input type="text" id="n'+x.id+'" placeholder="Note (required to reject)" style="width:190px;margin:0"><button class="btn" onclick="decide('+x.id+',1)">Approve</button><button class="btn alt" onclick="decide('+x.id+',0)">Reject</button>';
+  if(adm&&x.status==='approved')a='<button class="btn" onclick="markPaid('+x.id+')">Mark paid</button>';
+  return '<div class="card"><div class="row"><b>'+inr(x.amount)+' · '+x.cat+'</b><span class="badge '+x.status+'">'+x.status+'</span></div><div class="mut">'+x.date+(adm?' · '+esc(x.empName):'')+(x.order?' · Order #'+x.order:'')+(x.vendor?' · '+esc(x.vendor):'')+(x.qty?' · '+x.qty+' covers':'')+'</div><div style="margin:6px 0">'+esc(x.details)+'</div>'+(x.note?'<div class="mut">Reviewer note: '+esc(x.note)+'</div>':'')+(x.status==='paid'?'<div class="mut">Paid on '+x.paidOn+'</div>':'')+'<div class="row" style="justify-content:flex-start;gap:10px;flex-wrap:wrap;margin-top:8px">'+(x.pod?'<img class="pod" src="'+x.pod+'" onclick="viewPod(\'exp\','+x.id+')" alt="Bill for '+esc(x.cat)+'">':'')+a+'</div></div>'}
+function myExp(){var E=getEf(),mine=db.exp.filter(function(x){return x.emp===me.u}).sort(function(a,b){return b.ts-a.ts}),
+  sm=function(s){return mine.filter(function(x){return x.status===s}).reduce(function(a,x){return a+x.amount},0)},
+  ords=db.orders.filter(function(o){return o.mod==='rice'&&o.status!=='cancelled'}).slice(0,40),
+  h='<h2>My expenses</h2><div class="grid" style="margin-bottom:14px"><div class="card"><div class="mut">Waiting for review</div><div class="stat">'+inr(sm('submitted'))+'</div></div><div class="card"><div class="mut">Approved, to be paid</div><div class="stat">'+inr(sm('approved'))+'</div></div><div class="card"><div class="mut">Paid</div><div class="stat">'+inr(sm('paid'))+'</div></div></div>';
+  h+='<div class="card" style="margin-bottom:14px"><b>Add an expense</b><p class="mut" style="margin:4px 0 12px">An admin reviews the bill before you are paid.</p><div class="ef"><label>Date<input type="date" value="'+E.date+'" onchange="setEf(\'date\',this.value)"></label><label>Category<select onchange="efCat(this.value)">'+ECATS.map(function(c){return '<option'+(c===E.cat?' selected':'')+'>'+c+'</option>'}).join('')+'</select></label><label>Order (optional)<select onchange="efOrder(this.value)"><option value="">Not for one order</option>'+ords.map(function(o){return '<option value="'+o.id+'"'+(String(o.id)===String(E.order)?' selected':'')+'>#'+o.id+' · '+esc(o.custName)+' · '+bagsOf(o.id)+' bags</option>'}).join('')+'</select></label><label>Amount (₹)<input type="number" min="0" value="'+esc(E.amount)+'" oninput="setEf(\'amount\',this.value)"></label><label>Paid to<input type="text" value="'+esc(E.vendor)+'" placeholder="Shop, vendor or station" oninput="setEf(\'vendor\',this.value)"></label>'+(E.cat==='Covers'?'<label>Number of covers<input type="number" min="0" value="'+esc(E.qty)+'" oninput="setEf(\'qty\',this.value)"></label>':'')+'<label class="full">Details<textarea rows="2" placeholder="What was this for?" oninput="setEf(\'details\',this.value)">'+esc(E.details)+'</textarea></label>'+podField('ef',true)+'</div><button class="btn" style="margin-top:12px" onclick="submitExp()">Submit for approval</button></div>';
+  if(!mine.length)return h+'<div class="card"><b>No expenses yet</b><p class="mut" style="margin:4px 0 0">Petrol, food and cover purchases you submit will be listed here.</p></div>';
+  h+='<h4>Your submissions</h4><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">';mine.forEach(function(x){h+=expCard(x,false)});return h+'</div>'}
+function decide(id,ok){var x=find('exp',id),n=$('#n'+id).value.trim();if(!ok&&!n){toast('Add a note explaining the rejection');return}x.status=ok?'approved':'rejected';x.note=n;x.reviewer=me.name;save();render()}
+function markPaid(id){var x=find('exp',id);x.status='paid';x.paidOn=dstr(new Date());save();render()}
+function setPf(k,v){if(!v&&(k==='from'||k==='to'))v=dstr(new Date());pf[k]=v;render()}
+function expList(){var td=dstr(new Date());if(!pf)pf={from:td,to:td,emp:'all',status:'all',cat:'all'};
+  var lo=pf.from<=pf.to?pf.from:pf.to,hi=pf.from<=pf.to?pf.to:pf.from,
+  base=db.exp.filter(function(x){return x.date>=lo&&x.date<=hi&&(pf.emp==='all'||x.emp===pf.emp)&&(pf.cat==='all'||x.cat===pf.cat)}),
+  list=base.filter(function(x){return pf.status==='all'||x.status===pf.status}).sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:b.ts-a.ts}),
+  emps=[],seen={},ST=['submitted','approved','rejected','paid'];
+  db.exp.forEach(function(x){if(!seen[x.emp]){seen[x.emp]=1;emps.push([x.emp,x.empName])}});
+  var h='<h2>Employee payments</h2><div class="filters"><label>From<input type="date" value="'+pf.from+'" onchange="setPf(\'from\',this.value)"></label><label>To<input type="date" value="'+pf.to+'" onchange="setPf(\'to\',this.value)"></label><label>Employee<select onchange="setPf(\'emp\',this.value)"><option value="all">All employees</option>'+emps.map(function(e){return '<option value="'+esc(e[0])+'"'+(e[0]===pf.emp?' selected':'')+'>'+esc(e[1])+'</option>'}).join('')+'</select></label><label>Category<select onchange="setPf(\'cat\',this.value)"><option value="all">All</option>'+ECATS.map(function(c){return '<option'+(c===pf.cat?' selected':'')+'>'+c+'</option>'}).join('')+'</select></label><button class="btn alt" onclick="pf=null;render()">Today</button></div><div class="chips" style="flex-wrap:wrap;margin-top:0">';
+  ['all'].concat(ST).forEach(function(x){h+='<button class="chip'+(pf.status===x?' on':'')+'" style="flex:0 0 auto;padding:7px 14px" aria-pressed="'+(pf.status===x)+'" onclick="setPf(\'status\',\''+x+'\')">'+(x==='all'?'All':x)+' ('+(x==='all'?base.length:base.filter(function(y){return y.status===x}).length)+')</button>'});
+  h+='</div>';
+  var by={};base.forEach(function(x){var r=by[x.emp]=by[x.emp]||{n:x.empName,submitted:0,approved:0,paid:0,rejected:0};r[x.status]+=x.amount});
+  var ks=Object.keys(by);
+  if(ks.length){var T={submitted:0,approved:0,paid:0,rejected:0};h+='<div class="card tw" style="margin-bottom:14px"><table><tr><th>Employee</th><th>Waiting review</th><th>Approved, to pay</th><th>Paid</th><th>Rejected</th></tr>';
+    ks.forEach(function(k){var r=by[k];h+='<tr><td><b>'+esc(r.n)+'</b></td><td>'+inr(r.submitted)+'</td><td>'+inr(r.approved)+'</td><td>'+inr(r.paid)+'</td><td>'+inr(r.rejected)+'</td></tr>';ST.forEach(function(s){T[s]+=r[s]})});
+    h+='<tr><td><b>Total</b></td><td><b>'+inr(T.submitted)+'</b></td><td><b>'+inr(T.approved)+'</b></td><td><b>'+inr(T.paid)+'</b></td><td><b>'+inr(T.rejected)+'</b></td></tr></table></div>'}
+  if(!list.length)return h+'<div class="card"><b>No expenses match these filters</b><p class="mut" style="margin:4px 0 0">Widen the date range, or choose All to see every status.</p></div>';
+  h+='<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))">';list.forEach(function(x){h+=expCard(x,true)});return h+'</div>'}
+/* ---- maintenance ---- */
+function getMf(){if(!mf)mf={date:dstr(new Date()),machine:db.machines[0]||'',desc:'',vendor:'',amount:'',pod:''};return mf}
+function setMf(k,v){getMf()[k]=v}
+function addMaint(){var M=getMf(),a=parseFloat(M.amount);
+  if(!M.machine){toast('Choose the machine');return}if(!M.desc.trim()){toast('Describe the repair');return}if(!(a>0)){toast('Enter the amount spent');return}
+  db.maint.unshift({id:db.nx++,agency:ag,date:M.date||dstr(new Date()),machine:M.machine,desc:M.desc.trim(),vendor:M.vendor.trim(),amount:Math.round(a*100)/100,pod:M.pod,by:me.u,byName:me.name,ts:Date.now()});
+  if(!save()){db.maint.shift();return}mf=null;toast('Repair logged');render()}
+function delMaint(id){db.maint=db.maint.filter(function(x){return x.id!==id});save();render()}
+function addMachine(){var n=$('#mn').value.trim();if(!n){toast('Enter the machine name');return}if(db.machines.indexOf(n)>-1){toast('That machine is already listed');return}db.machines.push(n);save();toast('Machine added');render()}
+function repairs(){var M=getMf(),adm=me.role==='admin',l=db.maint.filter(function(x){return adm||x.by===me.u}).sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:b.ts-a.ts}),
+  h='<h2>Machine repairs</h2><div class="card" style="margin-bottom:14px"><b>Log a repair</b><div class="ef" style="margin-top:10px"><label>Date<input type="date" value="'+M.date+'" onchange="setMf(\'date\',this.value)"></label><label>Machine<select onchange="setMf(\'machine\',this.value)">'+db.machines.map(function(m){return '<option'+(m===M.machine?' selected':'')+'>'+esc(m)+'</option>'}).join('')+'</select></label><label>Amount (₹)<input type="number" min="0" value="'+esc(M.amount)+'" oninput="setMf(\'amount\',this.value)"></label><label>Mechanic or shop<input type="text" value="'+esc(M.vendor)+'" oninput="setMf(\'vendor\',this.value)"></label><label class="full">What was repaired?<textarea rows="2" placeholder="For example: belt replaced, bearing changed" oninput="setMf(\'desc\',this.value)">'+esc(M.desc)+'</textarea></label>'+podField('mf',false)+'</div><button class="btn" style="margin-top:12px" onclick="addMaint()">Save repair</button></div>';
+  if(adm)h+='<div class="card" style="margin-bottom:14px"><b>Add a machine</b><div class="row" style="margin-top:8px;flex-wrap:wrap"><input type="text" id="mn" placeholder="Machine name" style="flex:1;margin:0"><button class="btn alt" onclick="addMachine()">Add machine</button></div></div>';
+  if(!l.length)return h+'<div class="card"><b>No repairs logged yet</b><p class="mut" style="margin:4px 0 0">Repair costs you save here feed the maintenance report.</p></div>';
+  h+='<div class="card tw"><table><tr><th>Date</th><th>Machine</th><th>Repair</th><th>Mechanic or shop</th><th>By</th><th>Bill</th><th style="text-align:right">Amount</th>'+(adm?'<th></th>':'')+'</tr>';
+  l.forEach(function(x){h+='<tr><td>'+x.date+'</td><td>'+esc(x.machine)+'</td><td>'+esc(x.desc)+'</td><td>'+esc(x.vendor||'-')+'</td><td>'+esc(x.byName)+'</td><td>'+(x.pod?'<img class="pod" style="width:44px;height:44px" src="'+x.pod+'" onclick="viewPod(\'maint\','+x.id+')" alt="Bill">':'-')+'</td><td style="text-align:right">'+inr(x.amount)+'</td>'+(adm?'<td><button class="btn alt" onclick="delMaint('+x.id+')">Delete</button></td>':'')+'</tr>'});
+  return h+'</table></div>'}
+function setMr(k,v){if(!v&&(k==='from'||k==='to'))v=dstr(new Date());mr[k]=v;render()}
+function mtReport(){var td=dstr(new Date());if(!mr)mr={from:td,to:td,machine:'all'};
+  var lo=mr.from<=mr.to?mr.from:mr.to,hi=mr.from<=mr.to?mr.to:mr.from,
+  list=db.maint.filter(function(x){return x.date>=lo&&x.date<=hi&&(mr.machine==='all'||x.machine===mr.machine)}).sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:b.ts-a.ts}),
+  tot=list.reduce(function(a,x){return a+x.amount},0),by={};list.forEach(function(x){by[x.machine]=(by[x.machine]||0)+x.amount});
+  var ks=Object.keys(by).sort(function(a,b){return by[b]-by[a]}),
+  h='<h2>Maintenance report</h2><div class="filters"><label>From<input type="date" value="'+mr.from+'" onchange="setMr(\'from\',this.value)"></label><label>To<input type="date" value="'+mr.to+'" onchange="setMr(\'to\',this.value)"></label><label>Machine<select onchange="setMr(\'machine\',this.value)"><option value="all">All machines</option>'+db.machines.map(function(m){return '<option'+(m===mr.machine?' selected':'')+'>'+esc(m)+'</option>'}).join('')+'</select></label><button class="btn alt" onclick="mr=null;render()">Today</button></div>';
+  h+='<div class="grid" style="margin-bottom:14px"><div class="card"><div class="mut">Spent on repairs</div><div class="stat">'+inr(tot)+'</div></div><div class="card"><div class="mut">Repairs logged</div><div class="stat">'+list.length+'</div></div><div class="card"><div class="mut">Highest spend</div><div class="stat" style="font-size:20px">'+(ks[0]?esc(ks[0]):'None yet')+'</div></div></div>';
+  if(!list.length)return h+'<div class="card"><b>No repairs in this period</b><p class="mut" style="margin:4px 0 0">Widen the date range or choose All machines.</p></div>';
+  h+='<div class="card tw" style="margin-bottom:14px"><table><tr><th>Machine</th><th style="text-align:right">Spent</th></tr>';ks.forEach(function(k){h+='<tr><td>'+esc(k)+'</td><td style="text-align:right">'+inr(by[k])+'</td></tr>'});
+  h+='</table></div><div class="card tw"><table><tr><th>Date</th><th>Machine</th><th>Repair</th><th>Mechanic or shop</th><th>By</th><th style="text-align:right">Amount</th></tr>';
+  list.forEach(function(x){h+='<tr><td>'+x.date+'</td><td>'+esc(x.machine)+'</td><td>'+esc(x.desc)+'</td><td>'+esc(x.vendor||'-')+'</td><td>'+esc(x.byName)+'</td><td style="text-align:right">'+inr(x.amount)+'</td></tr>'});
+  return h+'</table></div>'}
+
+/* ---- payments: sections + maintenance charges per agency ---- */
+function setPt(v){pt=v;render()}
+function payTabs(){return '<div class="chips" style="flex-wrap:wrap;margin:0 0 14px">'+[['exp','Employee expenses'],['mt','Maintenance charges']].map(function(x){return '<button class="chip'+(pt===x[0]?' on':'')+'" style="flex:0 0 auto;padding:8px 16px" aria-pressed="'+(pt===x[0])+'" onclick="setPt(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')+'</div>'}
+function payments(){return payTabs()+(pt==='mt'?maintTab():expPayments())}
+function maintTab(){var td=dstr(new Date());
+  if(!db.agencies.length)return '<h2>Maintenance charges</h2>'+agBar();
+  if(!mr)mr={from:td.slice(0,8)+'01',to:td,machine:'all'};
+  var M=getMf(),A=find('agencies',ag)||db.agencies[0],
+  lo=mr.from<=mr.to?mr.from:mr.to,hi=mr.from<=mr.to?mr.to:mr.from,
+  inR=db.maint.filter(function(x){return x.date>=lo&&x.date<=hi&&(mr.machine==='all'||x.machine===mr.machine)}),
+  mine=inR.filter(function(x){return x.agency===ag}).sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:b.ts-a.ts}),
+  tot=mine.reduce(function(a,x){return a+x.amount},0),by={};mine.forEach(function(x){by[x.machine]=(by[x.machine]||0)+x.amount});
+  var ks=Object.keys(by).sort(function(a,b){return by[b]-by[a]}),
+  h='<h2>Maintenance charges</h2><p class="mut">Repairs and spares are tracked separately for each agency. Pick an agency to log and view its charges.</p>'+agBar();
+  h+='<div class="card" style="margin-bottom:14px"><b>Log a maintenance charge for '+esc(A.name)+'</b><div class="ef" style="margin-top:10px"><label>Date<input type="date" value="'+M.date+'" onchange="setMf(\'date\',this.value)"></label><label>Machine<select onchange="setMf(\'machine\',this.value)">'+db.machines.map(function(m){return '<option'+(m===M.machine?' selected':'')+'>'+esc(m)+'</option>'}).join('')+'</select></label><label>Amount (₹)<input type="number" min="0" value="'+esc(M.amount)+'" oninput="setMf(\'amount\',this.value)"></label><label>Mechanic or shop<input type="text" value="'+esc(M.vendor)+'" oninput="setMf(\'vendor\',this.value)"></label><label class="full">What was repaired?<textarea rows="2" placeholder="For example: belt replaced, bearing changed" oninput="setMf(\'desc\',this.value)">'+esc(M.desc)+'</textarea></label>'+podField('mf',false)+'</div><button class="btn" style="margin-top:12px" onclick="addMaint()">Save charge for '+esc(A.name)+'</button></div>';
+  h+='<div class="card" style="margin-bottom:14px"><b>Add a machine</b><div class="row" style="margin-top:8px;flex-wrap:wrap"><input type="text" id="mn" placeholder="Machine name" style="flex:1;margin:0"><button class="btn alt" onclick="addMachine()">Add machine</button></div></div>';
+  h+='<div class="filters"><label>From<input type="date" value="'+mr.from+'" onchange="setMr(\'from\',this.value)"></label><label>To<input type="date" value="'+mr.to+'" onchange="setMr(\'to\',this.value)"></label><label>Machine<select onchange="setMr(\'machine\',this.value)"><option value="all">All machines</option>'+db.machines.map(function(m){return '<option'+(m===mr.machine?' selected':'')+'>'+esc(m)+'</option>'}).join('')+'</select></label><button class="btn alt" onclick="mr=null;render()">This month</button></div>';
+  h+='<div class="card tw" style="margin-bottom:14px"><b>All agencies, same period</b><table><tr><th>Agency</th><th>Charges</th><th style="text-align:right">Total</th></tr>';
+  var gt=0,gn=0;db.agencies.forEach(function(a){var l=inR.filter(function(x){return x.agency===a.id}),t=l.reduce(function(s,x){return s+x.amount},0);gt+=t;gn+=l.length;h+='<tr'+(a.id===ag?' style="background:var(--bg)"':'')+'><td>'+(a.id===ag?'<b>':'')+esc(a.name)+(a.brand?' ('+esc(a.brand)+')':'')+(a.id===ag?'</b>':'')+'</td><td>'+l.length+'</td><td style="text-align:right">'+inr(t)+'</td></tr>'});
+  h+='<tr><td><b>Total</b></td><td><b>'+gn+'</b></td><td style="text-align:right"><b>'+inr(gt)+'</b></td></tr></table></div>';
+  h+='<div class="grid" style="margin-bottom:14px"><div class="card"><div class="mut">'+esc(A.name)+': maintenance spend</div><div class="stat">'+inr(tot)+'</div></div><div class="card"><div class="mut">Charges logged</div><div class="stat">'+mine.length+'</div></div><div class="card"><div class="mut">Highest spend</div><div class="stat" style="font-size:20px">'+(ks[0]?esc(ks[0]):'None yet')+'</div></div></div>';
+  if(!mine.length)return h+'<div class="card"><b>No maintenance charges for '+esc(A.name)+' in this period</b><p class="mut" style="margin:4px 0 0">Log one above, widen the date range, or choose All machines.</p></div>';
+  h+='<div class="card tw"><table><tr><th>Date</th><th>Machine</th><th>Repair</th><th>Mechanic or shop</th><th>By</th><th>Bill</th><th style="text-align:right">Amount</th><th></th></tr>';
+  mine.forEach(function(x){h+='<tr><td>'+x.date+'</td><td>'+esc(x.machine)+'</td><td>'+esc(x.desc)+'</td><td>'+esc(x.vendor||'-')+'</td><td>'+esc(x.byName)+'</td><td>'+(x.pod?'<img class="pod" style="width:44px;height:44px" src="'+x.pod+'" onclick="viewPod(\'maint\','+x.id+')" alt="Bill">':'-')+'</td><td style="text-align:right">'+inr(x.amount)+'</td><td><button class="btn alt" onclick="delMaint('+x.id+')">Delete</button></td></tr>'});
+  return h+'</table></div>'}
+
+/* ---- admin: record an employee payment/expense ---- */
+function staffUsers(){return db.users.filter(function(u){return u.role!=='customer'&&u.status!=='pending'&&u.status!=='disabled'})}
+function submitAdminExp(){var E=getEf(),a=parseFloat(E.amount),us=staffUsers(),u=us.filter(function(x){return x.u===(E.emp||(us[0]&&us[0].u))})[0];
+  if(!u){toast('Choose the employee');return}
+  if(!(a>0)){toast('Enter the amount');return}
+  if(!E.details.trim()){toast('Add details of what this was for');return}
+  if(E.cat==='Covers'&&!(parseInt(E.qty,10)>0)){toast('Enter how many covers');return}
+  var d=E.date||dstr(new Date()),st=E.st||'approved',x={id:db.nx++,date:d,emp:u.u,empName:u.name,cat:E.cat,amount:Math.round(a*100)/100,vendor:E.vendor.trim(),qty:parseInt(E.qty,10)||0,details:E.details.trim(),order:E.order?+E.order:null,pod:E.pod,status:st,note:'',addedBy:me.name,ts:Date.now()};
+  if(st!=='submitted')x.reviewer=me.name;if(st==='paid')x.paidOn=d;
+  db.exp.unshift(x);if(!save()){db.exp.shift();return}
+  var keep=E.emp;ef=null;getEf().emp=keep;toast('Payment record added');render()}
+function expPayments(){var E=getEf(),us=staffUsers(),cur=E.emp||(us[0]&&us[0].u)||'',
+  ords=db.orders.filter(function(o){return o.mod==='rice'&&o.status!=='cancelled'}).slice(0,40),
+  h='<div class="card" style="margin-bottom:14px"><b>Add a payment record</b><p class="mut" style="margin:4px 0 12px">Record petrol, food, covers or other money paid to or spent by an employee. Employees can also add their own under My expenses.</p><div class="ef">'
+  +'<label>Employee<select onchange="setEf(\'emp\',this.value)">'+us.map(function(u){return '<option value="'+esc(u.u)+'"'+(u.u===cur?' selected':'')+'>'+esc(u.name)+'</option>'}).join('')+'</select></label>'
+  +'<label>Date<input type="date" value="'+E.date+'" onchange="setEf(\'date\',this.value)"></label>'
+  +'<label>Category<select onchange="efCat(this.value)">'+ECATS.map(function(c){return '<option'+(c===E.cat?' selected':'')+'>'+c+'</option>'}).join('')+'</select></label>'
+  +'<label>Amount (₹)<input type="number" min="0" value="'+esc(E.amount)+'" oninput="setEf(\'amount\',this.value)"></label>'
+  +'<label>Paid to<input type="text" value="'+esc(E.vendor)+'" placeholder="Shop, vendor or station" oninput="setEf(\'vendor\',this.value)"></label>'
+  +'<label>Order (optional)<select onchange="efOrder(this.value)"><option value="">Not for one order</option>'+ords.map(function(o){return '<option value="'+o.id+'"'+(String(o.id)===String(E.order)?' selected':'')+'>#'+o.id+' · '+esc(o.custName)+' · '+bagsOf(o.id)+' bags</option>'}).join('')+'</select></label>'
+  +'<label>Record as<select onchange="setEf(\'st\',this.value)">'+[['submitted','Waiting review'],['approved','Approved, to pay'],['paid','Already paid']].map(function(x){return '<option value="'+x[0]+'"'+(x[0]===E.st?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select></label>'
+  +(E.cat==='Covers'?'<label>Number of covers<input type="number" min="0" value="'+esc(E.qty)+'" oninput="setEf(\'qty\',this.value)"></label>':'')
+  +'<label class="full">Details<textarea rows="2" placeholder="What was this for?" oninput="setEf(\'details\',this.value)">'+esc(E.details)+'</textarea></label>'+podField('ef',false)+'</div><button class="btn" style="margin-top:12px" onclick="submitAdminExp()">Save payment record</button></div>';
+  return h+expList()}
+
+render();
+</script>
+</body>
+</html>
