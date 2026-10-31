@@ -523,12 +523,14 @@ async function handleApi(req, res, pathname) {
   if (req.method === 'GET' && pathname === '/api/state') {
     const auth = sessionFor(req);
     if (!auth) return sendError(res, 401, 'Sign in to continue.', 'unauthorized');
+    if (auth.user.mustChange) return sendError(res, 403, 'Change your temporary password before continuing.', 'password_change_required');
     auth.session.revision = revision;
     return sendJson(res, 200, { user: publicUser(auth.user), state: publicState(auth.user), revision });
   }
   if (req.method === 'GET' && pathname === '/api/admin/backup') {
     const auth = sessionFor(req);
     if (!auth) return sendError(res, 401, 'Sign in to continue.', 'unauthorized');
+    if (auth.user.mustChange) return sendError(res, 403, 'Change your temporary password before continuing.', 'password_change_required');
     if (!isAdmin(auth.user)) return sendError(res, 403, 'Admin access is required.', 'forbidden');
     // Flush WAL pages, then take a synchronous snapshot so no request can write mid-copy.
     const checkpoint = sql.prepare('PRAGMA wal_checkpoint(FULL)').get();
@@ -614,6 +616,9 @@ async function handleApi(req, res, pathname) {
 
   const auth = sessionFor(req);
   if (!auth) return sendError(res, 401, 'Sign in to continue.', 'unauthorized');
+  if (auth.user.mustChange && !(req.method === 'POST' && pathname === '/api/password')) {
+    return sendError(res, 403, 'Change your temporary password before continuing.', 'password_change_required');
+  }
   if (req.method === 'POST' && pathname === '/api/password') {
     const old = String(body.current || ''), next = String(body.password || '');
     if (!await passwordMatches(old, auth.user.password)) return sendError(res, 400, 'Your current password is not correct.', 'wrong_password');
@@ -638,6 +643,26 @@ async function handleApi(req, res, pathname) {
     auditEvent(auth.user, 'user-created', `${username} as ${role}`); persist(state);
     auth.session.revision = revision;
     return sendJson(res, 201, { user: publicUser(auth.user), state: publicState(auth.user), revision });
+  }
+  if (req.method === 'POST' && pathname === '/api/admin/users/reset-password') {
+    if (!isAdmin(auth.user)) return sendError(res, 403, 'Admin access is required.', 'forbidden');
+    const username = clean(body.username, 20).toLowerCase();
+    const target = userByName(username);
+    if (!target || target.status !== 'active') return sendError(res, 404, 'An active account with that username was not found.', 'user_not_found');
+    if (target.u === auth.user.u) return sendError(res, 400, 'Use Account to change your own password.', 'self_reset_denied');
+    let temporaryPassword;
+    do { temporaryPassword = `Aa7${crypto.randomBytes(24).toString('base64url')}`; }
+    while (temporaryPassword.toLowerCase().includes(target.u));
+    target.password = await passwordHash(temporaryPassword);
+    target.mustChange = 1;
+    auditEvent(auth.user, 'password-reset-issued', username);
+    persist(state);
+    auth.session.revision = revision;
+    for (const [token, session] of sessions) if (session.u === username) sessions.delete(token);
+    return sendJson(res, 200, {
+      user: publicUser(auth.user), target: publicUser(target), state: publicState(auth.user), revision,
+      temporaryPassword
+    });
   }
   if (req.method === 'PUT' && pathname === '/api/state') {
     if (!validInputState(body.state)) return sendError(res, 400, 'The app data is not valid.', 'invalid_state');

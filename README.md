@@ -10,7 +10,7 @@ AmiraASTAR is a local business app for rice, hardware inventory, auto spare part
 
 The first start creates the admin and `data/amiraastar.sqlite`. The bootstrap password is only used when there is no active administrator in the database. The app binds to this computer only. The server and browser must stay on this computer; this setup does not provide remote or multi-device access.
 
-The seed catalog is example data. Before using the app for business, update products, stock, prices, agencies and delivery settings in the Admin screens. Confirm tax, return, privacy and record-keeping requirements for your business. There is no online payment integration, email/SMS delivery, or self-serve password recovery.
+The seed catalog is example data. Before using the app for business, update products, stock, prices, agencies and delivery settings in the Admin screens. Confirm tax, return, privacy and record-keeping requirements for your business. Online payments and email/SMS delivery are not integrated. An admin can issue a one-time temporary password for an active account from Security; the user must change it at the next sign-in.
 
 ## Public deployment on Render
 
@@ -54,6 +54,7 @@ API writes use same-origin JSON requests and the HttpOnly `amira_session` cookie
 | `PUT /api/state` | Signed in | Save permitted state changes with revision conflict detection |
 | `POST /api/password` | Signed in | Change password |
 | `POST /api/admin/users` | Admin | Create an account that must change its temporary password |
+| `POST /api/admin/users/reset-password` | Admin | Issue a one-time temporary password to an active account; next sign-in must change it |
 | `GET /api/admin/backup` | Admin | Download the SQLite database backup |
 | `POST /api/logout` | Local | End the current session |
 

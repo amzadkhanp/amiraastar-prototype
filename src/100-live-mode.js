@@ -221,6 +221,15 @@
     } catch (error) { message(error.message); }
   };
 
+  A2.resetUserPassword = async function (username) {
+    if (!me || me.role !== 'admin') return message('Admin access is required.');
+    try {
+      var payload = await api('/api/admin/users/reset-password', 'POST', { username: username });
+      install(payload); render();
+      modal('<div class="inv"><h3>Temporary password created</h3><p>Share this password privately with <b>' + esc(payload.target.name) + '</b>.</p><div class="card"><code style="word-break:break-all">' + esc(payload.temporaryPassword) + '</code></div><p class="mut">They must change it when they sign in. This password is shown only once.</p><button class="btn" data-close data-focus>Done</button></div>');
+    } catch (error) { message(error.message || 'Could not reset that password.'); }
+  };
+
   window.logout = async function () {
     try { await api('/api/logout', 'POST', {}); } catch (e) { /* clear the local view even if the server restarted */ }
     cart = []; me = null; mod = null; A2.applied = null; A2.force = 0;
