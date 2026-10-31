@@ -18,7 +18,7 @@ async function freePort() {
   return port;
 }
 
-async function launchProductionServer(t) {
+async function launchProductionServer(t, { storeOpen = false } = {}) {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'amiraastar-production-test-'));
   const expectedParent = `${path.resolve(os.tmpdir())}${path.sep}`;
   assert.ok(path.resolve(tempRoot).startsWith(expectedParent), 'test database must stay under the OS temp directory');
@@ -29,7 +29,7 @@ async function launchProductionServer(t) {
     env: {
       ...process.env,
       NODE_ENV: 'production', HOST: '127.0.0.1', PORT: String(port), DATA_DIR: dataDir,
-      STORE_OPEN: 'false', ADMIN_USERNAME: 'testadmin', ADMIN_PASSWORD: 'TestAdmin2026!'
+      STORE_OPEN: storeOpen ? 'true' : 'false', ADMIN_USERNAME: 'testadmin', ADMIN_PASSWORD: 'TestAdmin2026!'
     },
     stdio: ['ignore', 'pipe', 'pipe']
   });
@@ -168,4 +168,53 @@ test('production server gates a closed store and enforces account security', asy
   const backup = await request(base, '/api/admin/backup', { cookie: adminLogin.cookie });
   assert.equal(backup.response.status, 200);
   assert.equal(backup.data.subarray(0, 16).toString('binary'), 'SQLite format 3\u0000');
+});
+
+test('an invalid item in an open-store state save rolls back earlier order and stock changes', async (t) => {
+  const { base } = await launchProductionServer(t, { storeOpen: true });
+  const signup = await request(base, '/api/signup', {
+    method: 'POST',
+    body: { username: 'rollbackbuyer', email: 'rollbackbuyer@example.test', name: 'Rollback Buyer', password: 'RollbackBuyer2026!' }
+  });
+  assert.equal(signup.response.status, 201);
+  const cookie = signup.cookie;
+  let state = signup.data.state;
+  const revision = signup.data.revision;
+  const product = state.rice[0];
+  const wheel = Object.keys(product.v).find((key) => product.v[key].s > 0);
+  assert.ok(wheel, 'test catalog must have stock for a rice variant');
+  const initialStock = product.v[wheel].s;
+
+  const order = (id, productId) => ({
+    id,
+    items: [{ m: 'rice', id: productId, w: Number(wheel), q: 1 }],
+    addr: '1 Test Street', phone: '9876543210', pin: '560001'
+  });
+  state.orders.push(order(-10, product.id));
+  const placed = await request(base, '/api/state', { method: 'PUT', cookie, body: { state, revision } });
+  assert.equal(placed.response.status, 200);
+  const afterPlacement = await request(base, '/api/state', { cookie });
+  assert.equal(afterPlacement.response.status, 200);
+  assert.equal(afterPlacement.data.state.orders.length, 1);
+  assert.equal(afterPlacement.data.state.orders[0].pay, 'Pay on delivery');
+  assert.equal(afterPlacement.data.state.orders[0].paid, 0);
+  assert.equal(afterPlacement.data.state.rice[0].v[wheel].s, initialStock - 1);
+
+  const beforeFailure = afterPlacement.data.state;
+  const revisionBeforeFailure = afterPlacement.data.revision;
+  const stockBeforeFailure = beforeFailure.rice[0].v[wheel].s;
+  const attempted = structuredClone(beforeFailure);
+  attempted.orders.push(order(-11, product.id), order(-12, 999999));
+  const rejected = await request(base, '/api/state', {
+    method: 'PUT', cookie,
+    body: { state: attempted, revision: revisionBeforeFailure, profile: { name: 'Must Roll Back' } }
+  });
+  assert.equal(rejected.response.status, 409);
+
+  const afterFailure = await request(base, '/api/state', { cookie });
+  assert.equal(afterFailure.response.status, 200);
+  assert.equal(afterFailure.data.revision, revisionBeforeFailure);
+  assert.equal(afterFailure.data.state.orders.length, 1);
+  assert.equal(afterFailure.data.state.rice[0].v[wheel].s, stockBeforeFailure);
+  assert.equal(afterFailure.data.user.name, 'Rollback Buyer');
 });
