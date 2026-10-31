@@ -45,7 +45,7 @@ For the Render deployment, first close the store (`STORE_OPEN=false`) and restar
 scp -s "C:\path\to\amiraastar-backup.sqlite" YOUR_SERVICE@ssh.singapore.render.com:/var/data/restore.pending.sqlite
 ```
 
-Restart the service from Render. Its start command validates and restores the pending file before opening SQLite, then removes the uploaded file. The previous database is preserved beside it with a `.before-restore-<timestamp>.sqlite` suffix. If validation fails, the upload is moved to a `.rejected-<timestamp>` file and the existing database starts normally. Confirm the restored records and admin sign-in before reopening the store. Disk-backed Render deploys and restarts cause a short interruption.
+Restart the service from Render. Its start command validates and restores the pending file before opening SQLite, then removes the uploaded file. The previous database is preserved beside it with a `.before-restore-<timestamp>.sqlite` suffix. If validation fails, the upload is moved to a `.rejected-<timestamp>` file and the existing database starts normally. If rollback itself fails, the service intentionally stays stopped and keeps the pending file; inspect the service logs and database files before trying again. Confirm the restored records and admin sign-in before reopening the store. Disk-backed Render deploys and restarts cause a short interruption.
 
 ## API reference
 

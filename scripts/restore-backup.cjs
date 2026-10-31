@@ -33,19 +33,51 @@ const stamp = new Date().toISOString().replace(/[:.]/g, '-');
 const staged = `${destination}.restore-${process.pid}`;
 const previous = `${destination}.before-restore-${stamp}`;
 let movedCurrent = false;
+const movedSidecars = [];
+function removeStagedArtifacts() {
+  for (const suffix of ['-wal', '-shm']) {
+    const sidecar = `${staged}${suffix}`;
+    if (fs.existsSync(sidecar)) fs.rmSync(sidecar);
+  }
+  if (fs.existsSync(staged)) fs.rmSync(staged);
+}
 try {
   fs.copyFileSync(source, staged, fs.constants.COPYFILE_EXCL);
   validate(staged);
+  // Opening a WAL-mode database for validation can create sidecars. The staged
+  // backup is fully validated and closed, so discard them before installing it.
+  for (const suffix of ['-wal', '-shm']) {
+    const sidecar = `${staged}${suffix}`;
+    if (fs.existsSync(sidecar)) fs.rmSync(sidecar);
+  }
   if (fs.existsSync(destination)) { fs.renameSync(destination, previous); movedCurrent = true; }
   for (const suffix of ['-wal', '-shm']) {
     const sidecar = `${destination}${suffix}`;
-    if (fs.existsSync(sidecar)) fs.renameSync(sidecar, `${previous}${suffix}`);
+    const previousSidecar = `${previous}${suffix}`;
+    if (fs.existsSync(sidecar)) {
+      fs.renameSync(sidecar, previousSidecar);
+      movedSidecars.push({ sidecar, previousSidecar });
+    }
   }
   fs.renameSync(staged, destination);
-  console.log(`Restored ${destination}`);
-  if (movedCurrent) console.log(`Previous database preserved at ${previous}`);
 } catch (error) {
-  if (fs.existsSync(staged)) fs.rmSync(staged, { force: true });
-  if (movedCurrent && !fs.existsSync(destination) && fs.existsSync(previous)) fs.renameSync(previous, destination);
+  const rollbackErrors = [];
+  try { removeStagedArtifacts(); }
+  catch (cleanupError) { console.error(`Could not remove staged restore files: ${cleanupError.message}`); }
+  for (const { sidecar, previousSidecar } of movedSidecars.reverse()) {
+    try {
+      if (fs.existsSync(previousSidecar) && !fs.existsSync(sidecar)) fs.renameSync(previousSidecar, sidecar);
+    } catch (rollbackError) { rollbackErrors.push(rollbackError); }
+  }
+  try {
+    if (movedCurrent && !fs.existsSync(destination) && fs.existsSync(previous)) fs.renameSync(previous, destination);
+  } catch (rollbackError) { rollbackErrors.push(rollbackError); }
+  if (rollbackErrors.length) {
+    console.error('Restore failed and rollback was incomplete. Keep the service stopped and inspect the database and sidecar files before restarting.');
+    for (const rollbackError of rollbackErrors) console.error(rollbackError);
+    process.exit(3);
+  }
   throw error;
 }
+console.log(`Restored ${destination}`);
+if (movedCurrent) console.log(`Previous database preserved at ${previous}`);

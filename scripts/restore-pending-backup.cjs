@@ -26,6 +26,10 @@ if (result.error) {
   process.exit(1);
 }
 if (result.status !== 0) {
+  if (result.status === 3) {
+    console.error('Restore rollback was incomplete. Keep the service stopped and inspect the database files before restarting.');
+    process.exit(1);
+  }
   // Keep the current database available if validation fails. Move the bad upload aside
   // so a later restart doesn't repeatedly attempt the same restore.
   const rejected = `${pending}.rejected-${new Date().toISOString().replace(/[:.]/g, '-')}`;
