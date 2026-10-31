@@ -1,0 +1,909 @@
+{
+  "next": 1001,
+  "orders": [],
+  "users": [],
+  "invites": [],
+  "cards": {
+    "rice": {
+      "title": "RiceMarket",
+      "desc": "Sona Masoori, Basmati and more in 10, 20 and 25 kg bags, priced by variety and weight.",
+      "color": "#1f5a3f",
+      "on": 1
+    },
+    "hw": {
+      "title": "Hardware Inventory",
+      "desc": "Iron, cement, sand, pipes and wire with live stock and low-stock alerts.",
+      "color": "#8a4b12",
+      "on": 1
+    },
+    "mt": {
+      "title": "Maintenance charges",
+      "desc": "Machine repairs and spares, with a spend report.",
+      "color": "#6b3fa0",
+      "on": 1
+    },
+    "ap": {
+      "title": "Auto Spare Parts",
+      "desc": "Spare parts for cars, bikes, autos, trucks and tractors. Find parts by vehicle type and model, with live stock and low-stock alerts.",
+      "color": "#0f766e",
+      "on": 1
+    }
+  },
+  "rice": [
+    {
+      "id": 1,
+      "name": "Sona Masoori",
+      "note": "Everyday medium-grain, soft and light",
+      "on": 1,
+      "v": {
+        "10": {
+          "p": 620,
+          "s": 50
+        },
+        "20": {
+          "p": 1200,
+          "s": 30
+        },
+        "25": {
+          "p": 1450,
+          "s": 40
+        }
+      }
+    },
+    {
+      "id": 2,
+      "name": "Basmati",
+      "note": "Long, aromatic grains for biryani and pulao",
+      "on": 1,
+      "v": {
+        "10": {
+          "p": 1100,
+          "s": 20
+        },
+        "20": {
+          "p": 2150,
+          "s": 15
+        },
+        "25": {
+          "p": 2600,
+          "s": 10
+        }
+      }
+    },
+    {
+      "id": 3,
+      "name": "Ponni Boiled",
+      "note": "Sturdy parboiled rice for daily meals",
+      "on": 1,
+      "v": {
+        "10": {
+          "p": 560,
+          "s": 40
+        },
+        "20": {
+          "p": 1090,
+          "s": 25
+        },
+        "25": {
+          "p": 1320,
+          "s": 30
+        }
+      }
+    },
+    {
+      "id": 4,
+      "name": "Idli Rice",
+      "note": "Short-grain, made for soft idli and dosa",
+      "on": 1,
+      "v": {
+        "10": {
+          "p": 540,
+          "s": 35
+        },
+        "20": {
+          "p": 1050,
+          "s": 20
+        },
+        "25": {
+          "p": 1270,
+          "s": 0
+        }
+      }
+    },
+    {
+      "id": 5,
+      "name": "Brown Rice",
+      "note": "Whole grain with the bran intact",
+      "on": 1,
+      "v": {
+        "10": {
+          "p": 780,
+          "s": 12
+        },
+        "20": {
+          "p": 1520,
+          "s": 8
+        },
+        "25": {
+          "p": 1850,
+          "s": 6
+        }
+      }
+    }
+  ],
+  "hw": [
+    {
+      "id": 1,
+      "name": "TMT Bar Fe500D 8 mm",
+      "cat": "Iron & Steel",
+      "unit": "12 m rod",
+      "p": 322,
+      "s": 300,
+      "min": 50,
+      "on": 1
+    },
+    {
+      "id": 2,
+      "name": "TMT Bar Fe500D 10 mm",
+      "cat": "Iron & Steel",
+      "unit": "12 m rod",
+      "p": 503,
+      "s": 260,
+      "min": 50,
+      "on": 1
+    },
+    {
+      "id": 3,
+      "name": "TMT Bar Fe500D 12 mm",
+      "cat": "Iron & Steel",
+      "unit": "12 m rod",
+      "p": 725,
+      "s": 220,
+      "min": 40,
+      "on": 1
+    },
+    {
+      "id": 4,
+      "name": "TMT Bar Fe500D 16 mm",
+      "cat": "Iron & Steel",
+      "unit": "12 m rod",
+      "p": 1290,
+      "s": 120,
+      "min": 30,
+      "on": 1
+    },
+    {
+      "id": 5,
+      "name": "MS Angle 40x40x5 mm",
+      "cat": "Iron & Steel",
+      "unit": "6 m length",
+      "p": 1150,
+      "s": 60,
+      "min": 15,
+      "on": 1
+    },
+    {
+      "id": 6,
+      "name": "Cement OPC 53 Grade",
+      "cat": "Cement",
+      "unit": "50 kg bag",
+      "p": 410,
+      "s": 400,
+      "min": 80,
+      "on": 1
+    },
+    {
+      "id": 7,
+      "name": "Cement PPC",
+      "cat": "Cement",
+      "unit": "50 kg bag",
+      "p": 385,
+      "s": 520,
+      "min": 80,
+      "on": 1
+    },
+    {
+      "id": 8,
+      "name": "Rasi (river sand)",
+      "cat": "Sand & Aggregates",
+      "unit": "tonne",
+      "p": 1800,
+      "s": 40,
+      "min": 10,
+      "on": 1
+    },
+    {
+      "id": 9,
+      "name": "M-Sand",
+      "cat": "Sand & Aggregates",
+      "unit": "tonne",
+      "p": 1200,
+      "s": 60,
+      "min": 10,
+      "on": 1
+    },
+    {
+      "id": 10,
+      "name": "PVC Pipe 1 inch (ISI)",
+      "cat": "Pipes",
+      "unit": "6 m length",
+      "p": 380,
+      "s": 150,
+      "min": 30,
+      "on": 1
+    },
+    {
+      "id": 11,
+      "name": "PVC Drainage Pipe 4 inch",
+      "cat": "Pipes",
+      "unit": "6 m length",
+      "p": 1150,
+      "s": 70,
+      "min": 15,
+      "on": 1
+    },
+    {
+      "id": 12,
+      "name": "GI Pipe 1 inch (Medium)",
+      "cat": "Pipes",
+      "unit": "6 m length",
+      "p": 1650,
+      "s": 45,
+      "min": 12,
+      "on": 1
+    },
+    {
+      "id": 13,
+      "name": "MS Binding Wire 20 gauge",
+      "cat": "Wire",
+      "unit": "kg",
+      "p": 78,
+      "s": 500,
+      "min": 100,
+      "on": 1
+    },
+    {
+      "id": 14,
+      "name": "GI Wire 12 gauge",
+      "cat": "Wire",
+      "unit": "kg",
+      "p": 95,
+      "s": 250,
+      "min": 50,
+      "on": 1
+    },
+    {
+      "id": 15,
+      "name": "Welded Wire Mesh 6x3 ft",
+      "cat": "Wire",
+      "unit": "sheet",
+      "p": 640,
+      "s": 8,
+      "min": 10,
+      "on": 1
+    }
+  ],
+  "agencies": [
+    {
+      "id": 1,
+      "name": "Sri Karthikeya Rice Industries",
+      "brand": "JPC",
+      "on": 1
+    }
+  ],
+  "exp": [],
+  "nx": 1,
+  "maint": [],
+  "machines": [
+    "Rice mill",
+    "Polisher",
+    "Sortex machine",
+    "Conveyor",
+    "Packing machine",
+    "Generator",
+    "Other"
+  ],
+  "settings": {
+    "vendor": "Regular cover vendor",
+    "rate": 500,
+    "idleMin": 15,
+    "demo": 0,
+    "fee": 60,
+    "free": 1500
+  },
+  "rag": {
+    "hwRedPct": 25,
+    "riceAmber": 10,
+    "orderAmberH": 24,
+    "orderRedH": 48,
+    "expAmberD": 2,
+    "expRedD": 5,
+    "payAmberD": 3,
+    "payRedD": 7,
+    "retAmberD": 2,
+    "retRedD": 4
+  },
+  "spent": [],
+  "wish": {},
+  "lock": {},
+  "reviews": [],
+  "audit": [],
+  "stockLog": [],
+  "coupons": [
+    {
+      "code": "WELCOME5",
+      "type": "pct",
+      "value": 5,
+      "min": 500,
+      "max": 150,
+      "on": 1,
+      "exp": ""
+    },
+    {
+      "code": "BULK100",
+      "type": "flat",
+      "value": 100,
+      "min": 2000,
+      "max": 100,
+      "on": 1,
+      "exp": ""
+    }
+  ],
+  "demoUsers": 0,
+  "ver": 2,
+  "ap": [
+    {
+      "id": 1,
+      "name": "Brake pad set (front)",
+      "cat": "Brakes",
+      "vtype": "Car",
+      "models": [
+        "Maruti Swift",
+        "Maruti Alto",
+        "Hyundai i20"
+      ],
+      "brand": "Bosch",
+      "pno": "BP-1021",
+      "unit": "set",
+      "p": 1450,
+      "s": 24,
+      "min": 6,
+      "on": 1
+    },
+    {
+      "id": 2,
+      "name": "Brake pad set (front)",
+      "cat": "Brakes",
+      "vtype": "Car",
+      "models": [
+        "Hyundai Creta",
+        "Tata Nexon",
+        "Honda City"
+      ],
+      "brand": "Bosch",
+      "pno": "BP-2045",
+      "unit": "set",
+      "p": 2150,
+      "s": 14,
+      "min": 5,
+      "on": 1
+    },
+    {
+      "id": 3,
+      "name": "Oil filter",
+      "cat": "Filters",
+      "vtype": "Car",
+      "models": [
+        "Maruti Swift",
+        "Maruti Alto",
+        "Hyundai i20",
+        "Honda City"
+      ],
+      "brand": "Mann-Filter",
+      "pno": "OF-118",
+      "unit": "piece",
+      "p": 240,
+      "s": 60,
+      "min": 15,
+      "on": 1
+    },
+    {
+      "id": 4,
+      "name": "Air filter",
+      "cat": "Filters",
+      "vtype": "Car",
+      "models": [
+        "Maruti Swift",
+        "Hyundai i20"
+      ],
+      "brand": "Mann-Filter",
+      "pno": "AF-330",
+      "unit": "piece",
+      "p": 380,
+      "s": 32,
+      "min": 10,
+      "on": 1
+    },
+    {
+      "id": 5,
+      "name": "Spark plug (set of 4)",
+      "cat": "Engine",
+      "vtype": "Car",
+      "models": [
+        "Maruti Swift",
+        "Maruti Alto"
+      ],
+      "brand": "NGK",
+      "pno": "SP-4X",
+      "unit": "set",
+      "p": 520,
+      "s": 40,
+      "min": 10,
+      "on": 1
+    },
+    {
+      "id": 6,
+      "name": "Clutch plate",
+      "cat": "Clutch & transmission",
+      "vtype": "Car",
+      "models": [
+        "Mahindra Scorpio"
+      ],
+      "brand": "Valeo",
+      "pno": "CL-9021",
+      "unit": "piece",
+      "p": 3850,
+      "s": 6,
+      "min": 3,
+      "on": 1
+    },
+    {
+      "id": 7,
+      "name": "Front shock absorber",
+      "cat": "Suspension",
+      "vtype": "Car",
+      "models": [
+        "Tata Nexon",
+        "Hyundai Creta"
+      ],
+      "brand": "Gabriel",
+      "pno": "SA-F77",
+      "unit": "piece",
+      "p": 3200,
+      "s": 8,
+      "min": 4,
+      "on": 1
+    },
+    {
+      "id": 8,
+      "name": "Car battery 12V 45Ah",
+      "cat": "Electrical",
+      "vtype": "Car",
+      "models": [
+        "Maruti Swift",
+        "Maruti Alto",
+        "Hyundai i20",
+        "Honda City"
+      ],
+      "brand": "Exide",
+      "pno": "BT-45",
+      "unit": "piece",
+      "p": 4950,
+      "s": 9,
+      "min": 3,
+      "on": 1
+    },
+    {
+      "id": 9,
+      "name": "Headlight bulb H4",
+      "cat": "Body & lights",
+      "vtype": "Car",
+      "models": [
+        "All"
+      ],
+      "brand": "Philips",
+      "pno": "HB-H4",
+      "unit": "piece",
+      "p": 260,
+      "s": 70,
+      "min": 20,
+      "on": 1
+    },
+    {
+      "id": 10,
+      "name": "Wiper blade (pair)",
+      "cat": "Accessories",
+      "vtype": "Car",
+      "models": [
+        "All"
+      ],
+      "brand": "Bosch",
+      "pno": "WB-22",
+      "unit": "pair",
+      "p": 420,
+      "s": 25,
+      "min": 8,
+      "on": 1
+    },
+    {
+      "id": 11,
+      "name": "Brake shoe set",
+      "cat": "Brakes",
+      "vtype": "Bike",
+      "models": [
+        "Hero Splendor",
+        "Honda Activa"
+      ],
+      "brand": "Minda",
+      "pno": "BS-110",
+      "unit": "set",
+      "p": 190,
+      "s": 80,
+      "min": 20,
+      "on": 1
+    },
+    {
+      "id": 12,
+      "name": "Chain sprocket kit",
+      "cat": "Engine",
+      "vtype": "Bike",
+      "models": [
+        "Bajaj Pulsar",
+        "TVS Apache"
+      ],
+      "brand": "Rolon",
+      "pno": "CK-150",
+      "unit": "kit",
+      "p": 1250,
+      "s": 18,
+      "min": 6,
+      "on": 1
+    },
+    {
+      "id": 13,
+      "name": "Air filter",
+      "cat": "Filters",
+      "vtype": "Bike",
+      "models": [
+        "Hero Splendor",
+        "Honda Activa"
+      ],
+      "brand": "Hiflo",
+      "pno": "AF-HS",
+      "unit": "piece",
+      "p": 210,
+      "s": 45,
+      "min": 12,
+      "on": 1
+    },
+    {
+      "id": 14,
+      "name": "Spark plug",
+      "cat": "Engine",
+      "vtype": "Bike",
+      "models": [
+        "All"
+      ],
+      "brand": "NGK",
+      "pno": "SP-B",
+      "unit": "piece",
+      "p": 160,
+      "s": 90,
+      "min": 25,
+      "on": 1
+    },
+    {
+      "id": 15,
+      "name": "Clutch cable",
+      "cat": "Clutch & transmission",
+      "vtype": "Bike",
+      "models": [
+        "Royal Enfield Classic 350"
+      ],
+      "brand": "Minda",
+      "pno": "CC-350",
+      "unit": "piece",
+      "p": 320,
+      "s": 7,
+      "min": 8,
+      "on": 1
+    },
+    {
+      "id": 16,
+      "name": "Rear tyre 90/90-12",
+      "cat": "Tyres & wheels",
+      "vtype": "Bike",
+      "models": [
+        "Honda Activa"
+      ],
+      "brand": "TVS Eurogrip",
+      "pno": "TY-9012",
+      "unit": "piece",
+      "p": 1850,
+      "s": 0,
+      "min": 4,
+      "on": 1
+    },
+    {
+      "id": 17,
+      "name": "Engine oil 10W-30 (1 L)",
+      "cat": "Lubricants",
+      "vtype": "Bike",
+      "models": [
+        "All"
+      ],
+      "brand": "Castrol",
+      "pno": "CO-1030",
+      "unit": "litre",
+      "p": 420,
+      "s": 60,
+      "min": 20,
+      "on": 1
+    },
+    {
+      "id": 18,
+      "name": "Battery 12V 5Ah",
+      "cat": "Electrical",
+      "vtype": "Bike",
+      "models": [
+        "Bajaj Pulsar",
+        "TVS Apache",
+        "Hero Splendor"
+      ],
+      "brand": "Exide",
+      "pno": "BT-5",
+      "unit": "piece",
+      "p": 1450,
+      "s": 12,
+      "min": 5,
+      "on": 1
+    },
+    {
+      "id": 19,
+      "name": "Clutch plate",
+      "cat": "Clutch & transmission",
+      "vtype": "Auto",
+      "models": [
+        "Bajaj RE"
+      ],
+      "brand": "Minda",
+      "pno": "CL-RE",
+      "unit": "piece",
+      "p": 690,
+      "s": 14,
+      "min": 5,
+      "on": 1
+    },
+    {
+      "id": 20,
+      "name": "Brake drum shoe set",
+      "cat": "Brakes",
+      "vtype": "Auto",
+      "models": [
+        "Bajaj RE",
+        "Piaggio Ape"
+      ],
+      "brand": "Minda",
+      "pno": "BD-AP",
+      "unit": "set",
+      "p": 540,
+      "s": 20,
+      "min": 6,
+      "on": 1
+    },
+    {
+      "id": 21,
+      "name": "Headlamp assembly",
+      "cat": "Body & lights",
+      "vtype": "Auto",
+      "models": [
+        "Piaggio Ape"
+      ],
+      "brand": "Minda",
+      "pno": "HL-AP",
+      "unit": "piece",
+      "p": 1280,
+      "s": 3,
+      "min": 3,
+      "on": 1
+    },
+    {
+      "id": 22,
+      "name": "Brake liner set",
+      "cat": "Brakes",
+      "vtype": "Truck",
+      "models": [
+        "Tata Ace",
+        "Mahindra Bolero Pik-Up",
+        "Ashok Leyland Dost"
+      ],
+      "brand": "Ferodo",
+      "pno": "BL-LCV",
+      "unit": "set",
+      "p": 1850,
+      "s": 18,
+      "min": 6,
+      "on": 1
+    },
+    {
+      "id": 23,
+      "name": "Leaf spring (rear)",
+      "cat": "Suspension",
+      "vtype": "Truck",
+      "models": [
+        "Tata Ace"
+      ],
+      "brand": "Jamna Auto",
+      "pno": "LS-ACE",
+      "unit": "piece",
+      "p": 4200,
+      "s": 5,
+      "min": 3,
+      "on": 1
+    },
+    {
+      "id": 24,
+      "name": "Diesel fuel filter",
+      "cat": "Filters",
+      "vtype": "Truck",
+      "models": [
+        "Tata Ace",
+        "Eicher Pro 2049",
+        "Tata 407"
+      ],
+      "brand": "Bosch",
+      "pno": "FF-D12",
+      "unit": "piece",
+      "p": 480,
+      "s": 36,
+      "min": 10,
+      "on": 1
+    },
+    {
+      "id": 25,
+      "name": "Truck tyre 7.50-16",
+      "cat": "Tyres & wheels",
+      "vtype": "Truck",
+      "models": [
+        "Tata 407",
+        "Eicher Pro 2049"
+      ],
+      "brand": "MRF",
+      "pno": "TY-750",
+      "unit": "piece",
+      "p": 9400,
+      "s": 6,
+      "min": 4,
+      "on": 1
+    },
+    {
+      "id": 26,
+      "name": "Engine oil 15W-40 (5 L)",
+      "cat": "Lubricants",
+      "vtype": "Truck",
+      "models": [
+        "All"
+      ],
+      "brand": "Castrol",
+      "pno": "CO-1540",
+      "unit": "can",
+      "p": 2150,
+      "s": 22,
+      "min": 8,
+      "on": 1
+    },
+    {
+      "id": 27,
+      "name": "Hydraulic filter",
+      "cat": "Filters",
+      "vtype": "Tractor",
+      "models": [
+        "Mahindra 575 DI",
+        "Swaraj 744 FE"
+      ],
+      "brand": "Mann-Filter",
+      "pno": "HF-TR",
+      "unit": "piece",
+      "p": 640,
+      "s": 16,
+      "min": 5,
+      "on": 1
+    },
+    {
+      "id": 28,
+      "name": "Clutch plate",
+      "cat": "Clutch & transmission",
+      "vtype": "Tractor",
+      "models": [
+        "Mahindra 575 DI"
+      ],
+      "brand": "Valeo",
+      "pno": "CL-575",
+      "unit": "piece",
+      "p": 5200,
+      "s": 4,
+      "min": 3,
+      "on": 1
+    },
+    {
+      "id": 29,
+      "name": "Tractor battery 12V 88Ah",
+      "cat": "Electrical",
+      "vtype": "Tractor",
+      "models": [
+        "All"
+      ],
+      "brand": "Exide",
+      "pno": "BT-88",
+      "unit": "piece",
+      "p": 8900,
+      "s": 5,
+      "min": 3,
+      "on": 1
+    },
+    {
+      "id": 30,
+      "name": "Engine oil 5W-30 synthetic (1 L)",
+      "cat": "Lubricants",
+      "vtype": "All",
+      "models": [
+        "All"
+      ],
+      "brand": "Castrol",
+      "pno": "CO-530",
+      "unit": "litre",
+      "p": 780,
+      "s": 70,
+      "min": 20,
+      "on": 1
+    },
+    {
+      "id": 31,
+      "name": "Coolant (1 L)",
+      "cat": "Lubricants",
+      "vtype": "All",
+      "models": [
+        "All"
+      ],
+      "brand": "Shell",
+      "pno": "CL-1L",
+      "unit": "litre",
+      "p": 260,
+      "s": 48,
+      "min": 15,
+      "on": 1
+    },
+    {
+      "id": 32,
+      "name": "Wash and polish kit",
+      "cat": "Accessories",
+      "vtype": "All",
+      "models": [
+        "All"
+      ],
+      "brand": "3M",
+      "pno": "AC-KIT",
+      "unit": "kit",
+      "p": 690,
+      "s": 18,
+      "min": 5,
+      "on": 1
+    },
+    {
+      "id": 33,
+      "name": "Tow rope",
+      "cat": "Accessories",
+      "vtype": "All",
+      "models": [
+        "All"
+      ],
+      "brand": "Generic",
+      "pno": "AC-TR",
+      "unit": "piece",
+      "p": 450,
+      "s": 4,
+      "min": 5,
+      "on": 1
+    }
+  ]
+}

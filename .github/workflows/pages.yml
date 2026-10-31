@@ -1,0 +1,56 @@
+name: Test and publish to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: The committed AmiraASTAR.html must match a fresh build
+        run: |
+          node build.cjs
+          git diff --exit-code AmiraASTAR.html
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Start the app and run the tests
+        run: |
+          node serve.cjs &
+          sleep 2
+          npx playwright test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Collect the site files
+        run: |
+          mkdir _site
+          cp AmiraASTAR.html index.html _site/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
