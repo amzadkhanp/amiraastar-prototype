@@ -11,5 +11,6 @@ work/prod-smoke-backup.sqlite-*
 data/*.sqlite
 data/*.sqlite-*
 data/*.db
+data/restore.pending.sqlite*
 data/amiraastar-pre-restore-*.sqlite
 data/amiraastar.sqlite.before-restore-*
