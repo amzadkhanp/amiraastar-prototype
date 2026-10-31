@@ -508,7 +508,7 @@ function protectHeaders(res) {
 }
 function serveApp(res) {
   const file = path.join(ROOT, 'AmiraASTAR.html');
-  if (!fs.existsSync(file)) return sendError(res, 503, 'Build AmiraASTAR.html first with python build.py.', 'app_not_built');
+  if (!fs.existsSync(file)) return sendError(res, 503, 'Build AmiraASTAR.html first with node build.cjs.', 'app_not_built');
   let html = fs.readFileSync(file, 'utf8');
   html = html.replace('</head>', '<meta name="amira-mode" content="live">\n</head>');
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Content-Length': Buffer.byteLength(html) });
