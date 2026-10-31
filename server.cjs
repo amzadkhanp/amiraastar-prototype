@@ -727,7 +727,7 @@ const server = http.createServer(async (req, res) => {
   if (url.pathname.startsWith('/api/')) {
     try { await handleApi(req, res, url.pathname); }
     catch (err) {
-      if (!res.headersSent) sendError(res, err.status || 500, err.status ? err.message : 'The request could not be completed.', err.status ? undefined : 'server_error');
+      if (!res.headersSent) sendError(res, err.status || 500, err.status ? err.message : 'The request could not be completed.', err.status ? (err.code || 'request_failed') : 'server_error');
       else res.destroy();
       if (!err.status) console.error('API error:', err.stack || err);
     }

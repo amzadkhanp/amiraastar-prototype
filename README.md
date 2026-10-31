@@ -4,13 +4,15 @@ AmiraASTAR is a local business app for rice, hardware inventory, auto spare part
 
 ## Start on Windows
 
-1. Install Node.js 24 or newer.
+1. Install Node.js 24.x.
 2. In PowerShell, run `.\setup-local.ps1` from this folder. On first run it securely prompts for an administrator username and password, saves them in the ignored `.env` file, and starts the app. Keep this window open.
 3. Open [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
 The first start creates the admin and `data/amiraastar.sqlite`. The bootstrap password is only used when there is no active administrator in the database. The app binds to this computer only. The server and browser must stay on this computer; this setup does not provide remote or multi-device access.
 
 The seed catalog is example data. Before using the app for business, update products, stock, prices, agencies and delivery settings in the Admin screens. Confirm tax, return, privacy and record-keeping requirements for your business. Online payments and email/SMS delivery are not integrated. An admin can issue a one-time temporary password for an active account from Security; the user must change it at the next sign-in.
+
+Run the production backend checks with `node --test tests/production-server.test.cjs` (or `npm run test:production`). These use Node's built-in test runner and an isolated temporary database.
 
 ## Public deployment on Render
 
