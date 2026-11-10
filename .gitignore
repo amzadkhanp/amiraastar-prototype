@@ -6,6 +6,7 @@ work/prod-smoke-data/
 work/prod-smoke-restored/
 work/prod-smoke-backup.sqlite
 work/prod-smoke-backup.sqlite-*
+work/perf-results/
 *.log
 .env
 data/*.sqlite
