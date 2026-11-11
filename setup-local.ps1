@@ -1,11 +1,15 @@
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath $PSScriptRoot
 
-if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-  throw 'Node.js 24 or newer is required. Install Node.js, reopen PowerShell, then run this script again.'
+$nodeExe = Join-Path $env:LOCALAPPDATA 'Programs\AmiraASTAR-Node24\node.exe'
+if (-not (Test-Path -LiteralPath $nodeExe)) {
+  $nodeCommand = Get-Command node -ErrorAction SilentlyContinue
+  if (-not $nodeCommand) { throw 'Node.js 24.x is required. Install it, reopen PowerShell, then run this script again.' }
+  $nodeExe = $nodeCommand.Source
 }
-$nodeMajor = [int]((& node -p "process.versions.node.split('.')[0]").Trim())
-if ($nodeMajor -lt 24) { throw "Node.js 24 or newer is required. Found Node.js $nodeMajor." }
+$nodeVersion = (& $nodeExe -p "process.versions.node").Trim()
+$nodeMajor = [int]($nodeVersion.Split('.')[0])
+if ($nodeMajor -ne 24) { throw "This project requires Node.js 24.x (package.json pins Node 24). Found Node.js $nodeVersion at $nodeExe." }
 
 if (-not (Test-Path -LiteralPath '.env')) {
   Write-Host 'Create the first AmiraASTAR administrator. These credentials are saved only in the local ignored .env file.'
@@ -42,4 +46,4 @@ if (-not (Test-Path -LiteralPath '.env')) {
 }
 
 Write-Host 'Starting AmiraASTAR at http://127.0.0.1:8000/ (press Ctrl+C to stop).'
-& node server.cjs
+& $nodeExe server.cjs

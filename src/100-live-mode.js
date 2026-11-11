@@ -6,6 +6,8 @@
   if (!document.querySelector('meta[name="amira-mode"][content="live"]')) return;
 
   var booted = false, revision = 0, queueEpoch = 0, writeQueue = Promise.resolve(), baseRender = window.render;
+  var hostedStorage = document.querySelector('meta[name="amira-storage"]') && document.querySelector('meta[name="amira-storage"]').content === 'hosted';
+  var storageDescription = hostedStorage ? 'the hosted SQLite database' : 'the SQLite database on this computer';
   window.AMIRA_LIVE = true;
   window.load = function () { return null; };
   window.ready = Promise.resolve();
@@ -134,7 +136,7 @@
     if (me && header && !header.querySelector('.live-storage')) {
       var label = document.createElement('span');
       label.className = 'live-storage';
-      label.textContent = 'Saved on this laptop';
+      label.textContent = hostedStorage ? 'Saved on server' : 'Saved on this computer';
       label.style.cssText = 'font-size:12px;opacity:.8';
       header.insertBefore(label, header.lastElementChild);
     }
@@ -267,7 +269,7 @@
   if (window.FIX) {
     FIX['Default passwords'] = 'No published demo accounts are enabled. Each account uses a server-side password hash.';
     FIX['Demo mode'] = 'Demo accounts are disabled in live mode.';
-    FIX['Where data lives'] = 'Accounts and business records are stored in the SQLite database on this laptop.';
+    FIX['Where data lives'] = 'Accounts and business records are stored in ' + storageDescription + '.';
   }
   var prototypeSecChecks = window.secChecks;
   window.secChecks = function () {
@@ -277,7 +279,7 @@
         item.lv = 'green'; item.why = 'Passwords are checked by the server and stored as scrypt hashes.';
       }
       if (item.n === 'Where data lives') {
-        item.lv = 'green'; item.why = 'Accounts and business records are stored in this laptop’s SQLite database.';
+        item.lv = 'green'; item.why = 'Accounts and business records are stored in ' + storageDescription + '.';
       }
     });
     return checks;
@@ -287,7 +289,7 @@
   api('/api/state').then(function (payload) { install(payload); render(); }).catch(function () {
     api('/api/bootstrap').then(function (payload) { install(payload); render(); }).catch(function () {
       var app = document.getElementById('app');
-      app.innerHTML = '<div class="wrap login"><h1>AmiraASTAR</h1><div class="banner" role="alert">Could not reach the AmiraASTAR local server. Keep the server window open and reload this page.</div></div>';
+      app.innerHTML = '<div class="wrap login"><h1>AmiraASTAR</h1><div class="banner" role="alert">Could not reach the AmiraASTAR server. ' + (hostedStorage ? 'Please try again shortly or contact your administrator.' : 'Keep the server window open and reload this page.') + '</div></div>';
     });
   });
 })();

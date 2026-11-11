@@ -8,6 +8,14 @@ AmiraASTAR is a local business app for rice, hardware inventory, auto spare part
 2. In PowerShell, run `.\setup-local.ps1` from this folder. On first run it securely prompts for an administrator username and password, saves them in the ignored `.env` file, and starts the app. Keep this window open.
 3. Open [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
+If you forget the local admin password, stop the AmiraASTAR server and run this from the project folder in Command Prompt:
+
+```cmd
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\reset-local-admin.ps1
+```
+
+The recovery script backs up the SQLite database, resets only `amiraadmin`, displays a one-time temporary password in that terminal, requires a password change at next sign-in, and starts AmiraASTAR. Keep the temporary password private.
+
 The first start creates the admin and `data/amiraastar.sqlite`. The bootstrap password is only used when there is no active administrator in the database. The app binds to this computer only. The server and browser must stay on this computer; this setup does not provide remote or multi-device access.
 
 The seed catalog is example data. Before using the app for business, update products, stock, prices, agencies and delivery settings in the Admin screens. Confirm tax, return, privacy and record-keeping requirements for your business. Online payments and email/SMS delivery are not integrated. An admin can issue a one-time temporary password for an active account from Security; the user must change it at the next sign-in.
@@ -76,13 +84,45 @@ Rebuild the static artifact after frontend changes:
 node build.cjs
 ```
 
-Start the SQLite-backed app:
+Start the SQLite-backed app with the local setup script. It selects the project-supported Node.js 24 runtime:
 
 ```powershell
-node server.cjs
+.\setup-local.ps1
 ```
 
 `node serve.cjs` serves the browser-only preview for development. GitHub Pages also serves only that static preview; it is not the SQLite-backed app. Do not use the Pages preview to record real customer or business data.
+
+## AmiraASTAR SMS: feature and test tracker
+
+The repository also includes a separate local-first app for tracking product features, test cases, execution history, and release reports. It uses its own SQLite database at `data/amiraastar-sms.sqlite` and does not change the AmiraASTAR business database.
+
+Start it with the same Node.js 24 runtime used by the main app:
+
+```powershell
+& "$env:LOCALAPPDATA\Programs\AmiraASTAR-Node24\node.exe" sms/server.cjs
+```
+
+Then open [http://127.0.0.1:8100](http://127.0.0.1:8100). The tracker binds to this computer only by default, needs no external service or npm package, and seeds an initial AmiraASTAR feature and test-case register the first time it runs. Features and cases can be edited, each execution is kept as history, and reports can be filtered, printed, or exported as CSV.
+
+“AmiraASTAR SMS” is the app name and intended domain branding. The `.com` domain is not connected; the app currently runs locally without hosting charges.
+
+## Performance testing
+
+The `perf/run.cjs` runner measures public application-page, health, and bootstrap reads without creating or changing business data. It uses only Node.js built-in modules. Reports are written to the ignored `work/perf-results/` folder as Markdown and JSON.
+
+Run a local smoke profile:
+
+```powershell
+& "$env:LOCALAPPDATA\Programs\AmiraASTAR-Node24\node.exe" perf/run.cjs --profile smoke
+```
+
+Available profiles are `smoke`, `load`, `stress`, `spike`, and `soak`. Scenarios are `browse`, `page`, `health`, and `bootstrap`. Example longer local load:
+
+```powershell
+& "$env:LOCALAPPDATA\Programs\AmiraASTAR-Node24\node.exe" perf/run.cjs --profile load --scenario browse
+```
+
+The runner caps localhost profiles at 50 virtual users, remote profiles at 10, and total duration at 15 minutes. Remote targets require the explicit `--allow-remote` option. Built-in scenarios use GET requests only; account creation, order writes, and stock changes are intentionally excluded from generic load runs.
 
 ## Data and security notes
 
